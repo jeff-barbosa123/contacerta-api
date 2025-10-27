@@ -1,0 +1,1 @@
+Testes manuais rápidos: login, swagger, clientes/produtos/pedidos e relatórios.

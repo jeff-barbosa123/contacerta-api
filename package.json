@@ -1,20 +1,52 @@
 {
   "name": "contacerta-api",
-  "version": "1.0.0",
-  "main": "index.js",
+  "version": "3.1.0",
+  "description": "API RESTful ContaCerta — Gestão financeira e controle de vendas para microempreendedores.",
+  "type": "module",
+  "main": "src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "lint": "node -e \"console.log('No lint configured')\"",
+    "test": "node --test"
+  },
+  "keywords": [
+    "contacerta",
+    "api",
+    "financeiro",
+    "cmv",
+    "express",
+    "microempreendedor",
+    "swagger",
+    "jwt"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "node-cron": "^3.0.3",
+    "swagger-ui-express": "^5.0.1",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "author": {
+    "name": "Jefferson Paulo Barbosa",
+    "email": "jefferson.p.barbosa23@gmail.com"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jeff-barbosa123/contacerta-api.git"
+    "url": "https://github.com/seuusuario/contacerta-api"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jeff-barbosa123/contacerta-api/issues"
+    "url": "https://github.com/seuusuario/contacerta-api/issues"
   },
-  "homepage": "https://github.com/jeff-barbosa123/contacerta-api#readme",
-  "description": ""
+  "homepage": "http://localhost:3000/api-docs"
 }

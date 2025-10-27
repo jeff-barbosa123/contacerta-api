@@ -1,0 +1,378 @@
+openapi: 3.0.0
+info:
+  title: API ContaCerta 
+  version: "1.0.0"
+  description: >
+    API RESTful para controle financeiro e de vendas — ContaCerta v3.
+    Inclui autenticação JWT, CRUDs, cálculo de CMV automático e relatórios.
+  contact:
+    name: Jefferson Paulo Barbosa
+
+servers:
+  - url: http://localhost:3000
+    description: Servidor local
+
+tags:
+  - name: auth
+    description: Autenticação e sessão
+  - name: clientes
+    description: Cadastro e gestão de clientes
+  - name: produtos
+    description: Cadastro e gestão de produtos
+  - name: pedidos
+    description: Registro e consulta de pedidos
+  - name: relatorios
+    description: Relatórios financeiros
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  # 🔁 Parâmetros reutilizáveis
+  parameters:
+    Authorization:
+      name: Authorization
+      in: header
+      description: Token JWT no formato **Bearer &lt;token&gt;**
+      required: true
+      schema:
+        type: string
+        example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    IdPath:
+      name: id
+      in: path
+      description: Identificador numérico do recurso
+      required: true
+      schema:
+        type: integer
+        example: 1
+
+  # 📦 Esquemas
+  schemas:
+    ErroPadrao:
+      type: object
+      properties:
+        status: { type: integer, example: 400 }
+        mensagem: { type: string, example: "Campos obrigatórios ausentes" }
+
+    UsuarioLogin:
+      type: object
+      required: [email, senha]
+      properties:
+        email: { type: string, example: "admin@contacerta.com" }
+        senha: { type: string, example: "admin123" }
+
+    UsuarioLoginResposta:
+      type: object
+      properties:
+        status: { type: integer, example: 200 }
+        mensagem: { type: string, example: "Login realizado com sucesso!" }
+        data:
+          type: object
+          properties:
+            usuario:
+              type: object
+              properties:
+                id: { type: integer, example: 1 }
+                nome: { type: string, example: "Administrador" }
+                email: { type: string, example: "admin@contacerta.com" }
+            token: { type: string, example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." }
+
+    Cliente:
+      type: object
+      properties:
+        id: { type: integer, example: 1 }
+        nome: { type: string, example: "Maria Souza" }
+        telefone: { type: string, example: "(81) 98888-7777" }
+        aniversario: { type: string, format: date, example: "1990-03-25" }
+
+    ClienteInput:
+      type: object
+      required: [nome, telefone, aniversario]
+      properties:
+        nome: { type: string, example: "João da Silva" }
+        telefone: { type: string, example: "(81) 97777-6666" }
+        aniversario: { type: string, format: date, example: "1985-11-12" }
+
+    Produto:
+      type: object
+      properties:
+        id: { type: integer, example: 1 }
+        nome: { type: string, example: "Bolo de Rolo" }
+        custo: { type: number, example: 12.5 }
+        preco: { type: number, example: 25.0 }
+        estoque: { type: integer, example: 30 }
+
+    ProdutoInput:
+      type: object
+      required: [nome, custo, preco, estoque]
+      properties:
+        nome: { type: string, example: "Coxinha de Frango" }
+        custo: { type: number, example: 3.0 }
+        preco: { type: number, example: 6.0 }
+        estoque: { type: integer, example: 100 }
+
+    Pedido:
+      type: object
+      properties:
+        id: { type: integer, example: 1 }
+        cliente_id: { type: integer, example: 1 }
+        itens:
+          type: array
+          items:
+            type: object
+            properties:
+              produto_id: { type: integer, example: 1 }
+              quantidade: { type: integer, example: 2 }
+        total: { type: number, example: 50.0 }
+        criadoEm: { type: string, example: "2025-10-26T10:00:00.000Z" }
+
+    PedidoInput:
+      type: object
+      required: [cliente_id, itens]
+      properties:
+        cliente_id: { type: integer, example: 1 }
+        itens:
+          type: array
+          items:
+            type: object
+            required: [produto_id, quantidade]
+            properties:
+              produto_id: { type: integer, example: 1 }
+              quantidade: { type: integer, example: 2 }
+
+    RelatorioCMV:
+      type: object
+      properties:
+        cmv_total: { type: number, example: 1500.75 }
+        cmv_base: { type: number, example: 12.5 }
+
+    RelatorioRendimentoItem:
+      type: object
+      properties:
+        produto: { type: string, example: "Bolo de Rolo" }
+        custo_unitario: { type: number, example: 12.5 }
+        preco_venda: { type: number, example: 25 }
+        quantidade: { type: integer, example: 20 }
+        lucro_unitario: { type: number, example: 12.5 }
+        margem_percentual: { type: string, example: "100.00%" }
+        rendimento_total: { type: number, example: 250 }
+
+# 🔐 Segurança global (continua existindo),
+# mas também mostramos Authorization como PARÂMETRO em cada rota protegida:
+security:
+  - bearerAuth: []
+
+paths:
+
+  # ---------- AUTH ----------
+  /api/auth/login:
+    post:
+      tags: [auth]
+      summary: Realiza o login e retorna o token JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UsuarioLogin" }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/UsuarioLoginResposta" } } } }
+        "400": { description: Requisição inválida, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401": { description: Credenciais incorretas, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "500": { description: Erro interno, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+
+  # ---------- CLIENTES ----------
+  /api/clientes:
+    get:
+      tags: [clientes]
+      summary: Lista clientes
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+      responses:
+        "200":
+          description: Lista de clientes
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Cliente" }
+        "401": { description: Token ausente ou inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+    post:
+      tags: [clientes]
+      summary: Cadastra novo cliente
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ClienteInput" }
+      responses:
+        "201": { description: Cliente criado, content: { application/json: { schema: { $ref: "#/components/schemas/Cliente" } } } }
+        "400": { description: Requisição inválida, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401": { description: Token ausente ou inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+
+  /api/clientes/{id}:
+    get:
+      tags: [clientes]
+      summary: Retorna cliente por ID
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+        - $ref: "#/components/parameters/IdPath"
+      responses:
+        "200": { description: Cliente encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/Cliente" } } } }
+        "401": { description: Token inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "404": { description: Cliente não encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+    put:
+      tags: [clientes]
+      summary: Atualiza dados do cliente
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+        - $ref: "#/components/parameters/IdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ClienteInput" }
+      responses:
+        "200": { description: Cliente atualizado, content: { application/json: { schema: { $ref: "#/components/schemas/Cliente" } } } }
+        "400": { description: Requisição inválida, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "404": { description: Cliente não encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+    delete:
+      tags: [clientes]
+      summary: Remove cliente
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+        - $ref: "#/components/parameters/IdPath"
+      responses:
+        "200": { description: Cliente removido }
+        "401": { description: Token inválido }
+        "404": { description: Cliente não encontrado }
+
+  # ---------- PRODUTOS ----------
+  /api/produtos:
+    get:
+      tags: [produtos]
+      summary: Lista produtos
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+      responses:
+        "200":
+          description: Lista de produtos
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Produto" }
+    post:
+      tags: [produtos]
+      summary: Cadastra novo produto
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProdutoInput" }
+      responses:
+        "201": { description: Produto criado, content: { application/json: { schema: { $ref: "#/components/schemas/Produto" } } } }
+        "400": { description: Requisição inválida }
+
+  /api/produtos/{id}:
+    get:
+      tags: [produtos]
+      summary: Retorna produto por ID
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+        - $ref: "#/components/parameters/IdPath"
+      responses:
+        "200": { description: Produto encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/Produto" } } } }
+        "404": { description: Produto não encontrado }
+    put:
+      tags: [produtos]
+      summary: Atualiza produto
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+        - $ref: "#/components/parameters/IdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProdutoInput" }
+      responses:
+        "200": { description: Produto atualizado }
+    delete:
+      tags: [produtos]
+      summary: Remove produto
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+        - $ref: "#/components/parameters/IdPath"
+      responses:
+        "200": { description: Produto removido }
+
+  # ---------- PEDIDOS ----------
+  /api/pedidos:
+    get:
+      tags: [pedidos]
+      summary: Lista pedidos
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+      responses:
+        "200":
+          description: Lista de pedidos
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Pedido" }
+    post:
+      tags: [pedidos]
+      summary: Cria novo pedido
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PedidoInput" }
+      responses:
+        "201": { description: Pedido criado }
+
+  /api/pedidos/{id}:
+    get:
+      tags: [pedidos]
+      summary: Retorna pedido por ID
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+        - $ref: "#/components/parameters/IdPath"
+      responses:
+        "200": { description: Pedido encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/Pedido" } } } }
+        "404": { description: Pedido não encontrado }
+
+  # ---------- RELATÓRIOS ----------
+  /api/relatorios/cmv:
+    get:
+      tags: [relatorios]
+      summary: Retorna o CMV total
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/RelatorioCMV" } } } }
+
+  /api/relatorios/rendimento:
+    get:
+      tags: [relatorios]
+      summary: Retorna rendimento por produto
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/RelatorioRendimentoItem" }
