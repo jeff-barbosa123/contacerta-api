@@ -11,9 +11,11 @@ export default function errorHandler(err, req, res, next) { // eslint-disable-li
   // 🔢 Define status e mensagem padrão
   const status = Number.isInteger(err?.status) ? err.status : 500;
   const mensagem = err?.message || 'Erro interno do servidor';
+  const codigo = err?.codigo; // 🆕 v2.1.0 – suporte a codigo e detalhes
+  const detalhes = err?.detalhes;
 
   // 📤 Retorna resposta estruturada
-  return res.status(status).json(errorResponse(status, mensagem));
+  return res.status(status).json(errorResponse(status, mensagem, codigo, detalhes));
 }
 
 // Também exporta nomeado, se precisar importar por { errorHandler }

@@ -2,6 +2,12 @@ import { db } from './dbMemory.js';
 
 // CMV = soma(custo_unitario * qtd) dos pedidos no período (se período for informado YYYY-MM)
 export async function cmv(periodo) {
+  // 🆕 v2.1.0 – validação do parâmetro periodo (YYYY-MM)
+  if (periodo && !/^\d{4}-(0[1-9]|1[0-2])$/.test(String(periodo))) {
+    const err = new Error('Parâmetro periodo inválido. Use YYYY-MM.');
+    err.status = 400; err.codigo = 'ERR_PERIODO_INVALIDO';
+    throw err;
+  }
   const filtrarPorPeriodo = (iso) => {
     if (!periodo) return true;
     return iso.startsWith(periodo); // YYYY-MM
