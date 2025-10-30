@@ -125,3 +125,4 @@ components:
       required: [token, novaSenha]
       properties:
         token: { type: string, example: "<token_de_reset>" }
+
