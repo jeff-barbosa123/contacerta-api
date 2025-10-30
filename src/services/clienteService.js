@@ -1,4 +1,4 @@
-import { db, nextId, paginate } from './dbMemory.js';
+﻿import { db, nextId, paginate } from './dbMemory.js';
 
 export async function listar({ nome, aniversario, page, limit }) {
   let items = [...db.clientes];
@@ -8,9 +8,20 @@ export async function listar({ nome, aniversario, page, limit }) {
 }
 
 export async function criar(data) {
-  if (!data || !data.nome || !data.telefone || !data.aniversario) {
-    throw Object.assign(new Error('Campos obrigatórios: nome, telefone, aniversario'), { status: 400 });
+  // 🆕 v2.1.0 – validações com códigos e detalhes
+  const missing = [];
+  if (!data || !data.nome) missing.push({ campo: 'nome', erro: 'Obrigatório' });
+  if (!data || !data.telefone) missing.push({ campo: 'telefone', erro: 'Obrigatório' });
+  if (!data || !data.aniversario) missing.push({ campo: 'aniversario', erro: 'Obrigatório' });
+  if (missing.length) { const e = new Error('Um ou mais campos estão inválidos ou ausentes.'); e.status = 400; e.codigo = 'ERR_VALIDACAO_CAMPOS'; e.detalhes = missing; throw e; }
+
+  // cpf_cnpj (se presente) deve ter formato válido (CPF 11 dígitos ou CNPJ 14 dígitos)
+  if (data.cpf_cnpj) {
+    const digits = String(data.cpf_cnpj).replace(/\D/g, '');
+    const ok = digits.length === 11 || digits.length === 14;
+    if (!ok) { const e = new Error('cpf_cnpj inválido'); e.status = 400; e.codigo = 'ERR_VALIDACAO_CAMPOS'; e.detalhes = [{ campo: 'cpf_cnpj', erro: 'Formato inválido' }]; throw e; }
   }
+
   const id = nextId('clientes');
   const novo = {
     id,
@@ -46,4 +57,5 @@ export async function remover(id) {
   db.clientes.splice(i, 1);
   return true;
 }
+
 

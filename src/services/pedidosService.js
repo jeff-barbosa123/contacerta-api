@@ -118,8 +118,8 @@ export async function criar(data) {
  * Busca pedido por ID
  */
 export async function obterPorId(id) {
+  // 🆕 v2.1.0 – retorna pedido ou null (controller trata 404)
   const pedido = db.pedidos.find(p => p.id === id) || null;
-  if (!pedido) return { success: false, message: 'Pedido nÃ£o encontrado.' };
-  return { success: true, data: pedido };
+  return pedido;
 }
 
