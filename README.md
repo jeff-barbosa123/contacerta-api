@@ -39,6 +39,21 @@ Documentação e coleções:
 - Swagger atualizado para refletir os novos campos de CMV e o formato de retorno de atualização de produto.
 - Postman atualizado com testes que verificam `data.mensagens` em criação de pedido, `sugestao` em atualização de produto e os novos campos do CMV.
 
+## Ambiente e Segurança
+
+- JWT_SECRET
+  - Obrigatório em produção. Sem ele, a aplicação não inicia.
+  - Define a assinatura dos tokens JWT (padrão de desenvolvimento usado apenas fora de produção).
+- JWT_EXPIRES_IN
+  - Tempo de expiração do token (padrão: `8h`).
+- ALLOW_DEV_LOGIN
+  - Quando `1` e fora de produção, permite fallback de login de desenvolvimento (admin) para facilitar testes locais.
+  - Nunca habilitar em produção.
+- NODE_ENV
+  - Em `production`, o forgot-password não retorna o token no corpo da resposta e o app exige `JWT_SECRET`.
+- DISABLE_CRON
+  - Quando `1`, desabilita o job automático de atualização de CMV.
+
 
 ## 🧱 Arquitetura da Aplicação
 

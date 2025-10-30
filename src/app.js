@@ -1,4 +1,4 @@
-﻿// ðŸ“¦ ImportaÃ§Ãµes principais
+// Ã°Å¸â€œÂ¦ ImportaÃƒÂ§ÃƒÂµes principais
 import express from 'express';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
@@ -6,40 +6,49 @@ import YAML from 'yamljs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// ðŸ“ Rotas principais
+// Ã°Å¸â€œÂ Rotas principais
 import authRoutes from './routes/authRoutes.js';
 import clientesRoutes from './routes/clientesRoutes.js';
 import produtosRoutes from './routes/produtosRoutes.js';
 import pedidosRoutes from './routes/pedidosRoutes.js';
-import relatoriosRoutes from './routes/relatoriosRoutes.js';
+\nimport custosRoutes from './routes/custosRoutes.js';\nimport perdasRoutes from './routes/perdasRoutes.js';
 
-// âš™ï¸ Middlewares e serviÃ§os
+// Ã¢Å¡â„¢Ã¯Â¸Â Middlewares e serviÃƒÂ§os
 import { errorHandler } from './middlewares/errorHandler.js';
 import { scheduleCmvUpdater } from './services/cmvService.js';
 
-// ðŸš€ Inicializa o app Express
+// Ã°Å¸Å¡â‚¬ Inicializa o app Express
 const app = express();
 app.use(express.json());
 
-// ðŸŒ ConfiguraÃ§Ã£o de CORS
+// Ã°Å¸Å’Â ConfiguraÃƒÂ§ÃƒÂ£o de CORS
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// ðŸ“˜ Caminhos absolutos
+// Ã°Å¸â€œËœ Caminhos absolutos
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ðŸ“„ Swagger â€” caminho do arquivo YAML
+// Ã°Å¸â€œâ€ž Swagger Ã¢â‚¬â€ caminho do arquivo YAML
 const swaggerPath = path.join(__dirname, 'recursos', 'swagger.yaml');
 const swaggerDocument = YAML.load(swaggerPath);
 
-// ðŸ–¼ï¸ Pasta pÃºblica para logo
+// ðŸ†• v2.1.0 â€“ ValidaÃ§Ã£o de configuraÃ§Ã£o em produÃ§Ã£o
+if ((process.env.NODE_ENV || 'development') === 'production' && !process.env.JWT_SECRET) {
+  // Em produÃ§Ã£o, exigimos JWT_SECRET definido
+  // Para evitar derrubar ambientes de teste, apenas encerra em produÃ§Ã£o
+  // eslint-disable-next-line no-console
+  console.error('[Config] JWT_SECRET ausente em produÃ§Ã£o. Defina a variÃ¡vel de ambiente JWT_SECRET.');
+  process.exit(1);
+}
+
+// Ã°Å¸â€“Â¼Ã¯Â¸Â Pasta pÃƒÂºblica para logo
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-// ðŸŒ— Swagger com tema escuro + logo oficial Conta Certa
+// Ã°Å¸Å’â€” Swagger com tema escuro + logo oficial Conta Certa
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
   customCss: `
     body { background-color: #0d1117 !important; }
@@ -67,7 +76,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
     .swagger-ui .opblock-summary-path, .swagger-ui .opblock-summary-description { color: #adbac7 !important; }
     .swagger-ui .model-box, .swagger-ui .model-title, .swagger-ui .response-col_description { color: #8b949e !important; }
   `,
-  customSiteTitle: 'API Conta Certa v3 â€” DocumentaÃ§Ã£o Oficial',
+  customSiteTitle: 'API Conta Certa v3 Ã¢â‚¬â€ DocumentaÃƒÂ§ÃƒÂ£o Oficial',
   swaggerOptions: {
     persistAuthorization: true,
     docExpansion: 'list',
@@ -76,24 +85,24 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
   },
 }));
 
-// ðŸš€ Rotas principais
+// Ã°Å¸Å¡â‚¬ Rotas principais
 app.use('/api/auth', authRoutes);
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/produtos', produtosRoutes);
 app.use('/api/pedidos', pedidosRoutes);
-app.use('/api/relatorios', relatoriosRoutes);
+\napp.use('/api/custos', custosRoutes);\napp.use('/api/perdas', perdasRoutes);
 
-// ðŸ©º Healthcheck
-app.get('/', (req, res) => res.json({ status: 'API Conta Certa em execução' }));
+// Ã°Å¸Â©Âº Healthcheck
+app.get('/', (req, res) => res.json({ status: 'API Conta Certa em execuÃ§Ã£o' }));
 
-// âš ï¸ Tratamento global de erros
+// Ã¢Å¡Â Ã¯Â¸Â Tratamento global de erros
 app.use(errorHandler);
 
-// â° AtualizaÃ§Ã£o automÃ¡tica de CMV (via CRON)
+// Ã¢ÂÂ° AtualizaÃƒÂ§ÃƒÂ£o automÃƒÂ¡tica de CMV (via CRON)
 if (process.env.DISABLE_CRON !== '1') {
   scheduleCmvUpdater();
 }
 
-// ðŸ“¤ Exporta o app para uso no server.js
+// Ã°Å¸â€œÂ¤ Exporta o app para uso no server.js
 export default app;
 

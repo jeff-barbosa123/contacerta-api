@@ -1,4 +1,4 @@
-﻿import { db, nextId, paginate } from './dbMemory.js';
+import { db, nextId, paginate } from './dbMemory.js';
 
 export async function listar({ nome, categoria, estoqueMin, page, limit }) {
   let items = [...db.produtos];
@@ -73,7 +73,12 @@ export async function atualizarCompleto(id, data) {
   // 🆕 v2.1.0 – sugestão de reajuste quando custo aumenta
   let sugestao;
   if (patch.custo !== undefined && Number(patch.custo) > Number(antigo.custo)) {
-    sugestao = 'O custo aumentou. Considere revisar o preco de venda.';
+    // 🆕 v2.1.0 – Mensagem sugerindo revisao de preco de venda quando custo aumenta
+    sugestao = '💰 O custo do produto aumentou. Considere revisar o preco de venda.';
+  }
+  // v2.1.0 - normaliza sugestao com texto claro (override)
+  if (sugestao) {
+    sugestao = 'O custo do produto aumentou. Considere revisar o preco de venda.';
   }
   return sugestao ? { updated: true, sugestao } : { updated: true };
 }

@@ -25,5 +25,19 @@ export const db = {
       total: 50.0,
       criadoEm: new Date().toISOString()
     }
+  ],
+  // v2.2.0 – ingredientes e receitas (BOM)
+  ingredientes: [
+    // { id: 1, nome: 'Arroz', unidade: 'kg', estoque: 20, custoUnitario: 6.5 }
+  ],
+  receitas: [
+    // { produto_id: 1, itens: [ { ingrediente_id: 1, quantidade: 0.15 } ] }
+  ],
+  // v2.3.0 – custos gerais do periodo e perdas
+  custos: [
+    // { id: 1, tipo: 'energia', valor: 350.00, periodo: '2025-10' }
+  ],
+  perdas: [
+    // { id: 1, referencia: 'ingrediente', ref_id: 1, tipo: 'descarte', quantidade: 1.2, valor: 7.8, periodo: '2025-10' }
   ]
 };

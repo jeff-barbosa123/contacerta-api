@@ -1,6 +1,7 @@
 import { db } from './dbMemory.js';
 
 // CMV = soma(custo_unitario * qtd) dos pedidos no período (se período for informado YYYY-MM)
+// 🆕 v2.1.0 – Mantem CMV e adiciona lucro_bruto_total e lucro_percentual
 export async function cmv(periodo) {
   // 🆕 v2.1.0 – validação do parâmetro periodo (YYYY-MM)
   if (periodo && !/^\d{4}-(0[1-9]|1[0-2])$/.test(String(periodo))) {
@@ -29,12 +30,24 @@ export async function cmv(periodo) {
   const lucro_bruto_total_fmt = Number(lucro_bruto_total.toFixed(2));
   const lucro_percentual = cmv_total_fmt > 0 ? Number(((lucro_bruto_total_fmt / cmv_total_fmt) * 100).toFixed(2)) : 0;
 
+  // 🆕 v2.1.0+ – Overheads e perdas por periodo (quando informados)
+  const somaValores = (arr) => arr.reduce((acc, v) => acc + Number(v || 0), 0);
+  const custosPeriodo = (db.custos || []).filter(c => !periodo || c.periodo === periodo);
+  const perdasPeriodo = (db.perdas || []).filter(p => !periodo || p.periodo === periodo);
+  const overhead_total = Number((somaValores(custosPeriodo.map(c => c.valor)) + somaValores(perdasPeriodo.map(p => p.valor))).toFixed(2));
+  const cmv_real_total = Number((cmv_total_fmt + overhead_total).toFixed(2));
+  const lucro_real_total = Number((lucro_bruto_total_fmt - overhead_total).toFixed(2));
+
   // novo: adiciona lucro_bruto_total e lucro_percentual (com zeros quando não houver pedidos)
   return {
     cmv_total: cmv_total_fmt,
     cmv_base,
     lucro_bruto_total: lucro_bruto_total_fmt,
     lucro_percentual,
+    // 🆕 v2.1.0+ – campos adicionais, mantendo compatibilidade
+    overhead_total,
+    cmv_real_total,
+    lucro_real_total,
     periodo: periodo || null
   };
 }

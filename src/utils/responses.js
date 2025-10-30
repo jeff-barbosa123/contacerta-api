@@ -1,4 +1,4 @@
-﻿// 🆕 v2.1.0 – Padronização de responses
+﻿// v2.1.0 – Padronização de responses
 const statusToDefaultCode = (status) => {
   switch (Number(status)) {
     case 400: return 'ERR_VALIDACAO_CAMPOS';
@@ -13,15 +13,19 @@ const statusToDefaultCode = (status) => {
 
 export function successResponse(data, mensagem = 'Operação realizada com sucesso', _statusCode = 200) {
   const metas = {};
+  let payload = data;
   if (data && typeof data === 'object') {
     if (Object.prototype.hasOwnProperty.call(data, 'avisosEstoque')) metas.avisosEstoque = data.avisosEstoque;
     if (Object.prototype.hasOwnProperty.call(data, 'sugestao')) metas.sugestao = data.sugestao;
+    payload = { ...data };
+    if ('avisosEstoque' in payload) delete payload.avisosEstoque;
+    if ('sugestao' in payload) delete payload.sugestao;
   }
   return {
     success: true,
     mensagem,
     ...metas,
-    data,
+    data: payload,
     timestamp: new Date().toISOString(),
   };
 }

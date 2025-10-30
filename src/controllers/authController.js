@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+﻿import dotenv from 'dotenv';
 dotenv.config();
 
 import jwt from 'jsonwebtoken';
@@ -12,15 +12,15 @@ import { successResponse, errorResponse } from '../utils/responses.js';
 export const login = async (req, res) => {
   const { email, senha } = req.body;
 
-  // 🧩 Validação básica
+  // ðŸ§© ValidaÃ§Ã£o bÃ¡sica
   if (!email || !senha) {
     return res
       .status(400)
-      .json(errorResponse(400, 'E-mail e senha são obrigatórios.'));
+      .json(errorResponse(400, 'E-mail e senha sÃ£o obrigatÃ³rios.'));
   }
 
   try {
-    // 🔐 Validação via service (ex.: banco de dados ou mock)
+    // ðŸ” ValidaÃ§Ã£o via service (ex.: banco de dados ou mock)
     const auth = await authLogin(email, senha);
 
     const usuario = {
@@ -28,18 +28,18 @@ export const login = async (req, res) => {
       nome:
         auth.perfil === 'admin'
           ? 'Administrador'
-          : auth.email?.split('@')[0] || 'Usuário',
+          : auth.email?.split('@')[0] || 'UsuÃ¡rio',
       email: auth.email,
     };
 
-    // ✅ Resposta de sucesso padronizada
+    // âœ… Resposta de sucesso padronizada
     return res
       .status(200)
       .json(successResponse({ usuario, token: auth.token }, 'Login realizado com sucesso!'));
 
   } catch (e) {
-    // 🧠 Fallback compatível com mock local
-    if (email === 'admin@contacerta.com' && senha === 'admin123') {
+    // ðŸ§  Fallback compatÃ­vel com mock local
+    if ((process.env.ALLOW_DEV_LOGIN === '1') && (process.env.NODE_ENV || 'development') !== 'production' && email === 'admin@contacerta.com' && senha === 'admin123') {
       const usuario = { id: 1, nome: 'Administrador', email };
       const token = jwt.sign(
         { id: usuario.id, email: usuario.email },
@@ -52,40 +52,36 @@ export const login = async (req, res) => {
         .json(successResponse({ usuario, token }, 'Login realizado com sucesso!'));
     }
 
-    // ❌ Resposta de erro padronizada
-    const status = e?.status || 401;
-    const mensagem = e?.mensagem || 'Credenciais inválidas.';
-    return res.status(status).json(errorResponse(status, mensagem));
+    // âŒ Resposta de erro padronizada
+    const status = e?.status || 401; const mensagem = e?.mensagem || 'Credenciais inválidas.'; const codigo = e?.codigo || (status === 401 ? 'ERR_CREDENCIAIS_INVALIDAS' : undefined); const detalhes = e?.detalhes; return res.status(status).json(errorResponse(status, mensagem, codigo, detalhes));
   }
 };
 
 /**
  * Controller de Registro
- * Cria um novo usuário e retorna token JWT
+ * Cria um novo usuÃ¡rio e retorna token JWT
  */
 export const register = async (req, res) => {
   const { email, senha, perfil, nome } = req.body || {};
 
   if (!email || !senha) {
-    return res.status(400).json(errorResponse(400, 'E-mail e senha são obrigatórios.'));
+    return res.status(400).json(errorResponse(400, 'E-mail e senha sÃ£o obrigatÃ³rios.'));
   }
   try {
     const novo = await authRegister(email, senha, perfil, nome);
     const usuario = {
       id: novo.id,
-      nome: novo.nome || (novo.perfil === 'admin' ? 'Administrador' : (novo.email?.split('@')[0] || 'Usuário')),
+      nome: novo.nome || (novo.perfil === 'admin' ? 'Administrador' : (novo.email?.split('@')[0] || 'UsuÃ¡rio')),
       email: novo.email
     };
-    return res.status(201).json(successResponse({ usuario, token: novo.token }, 'Usuário criado com sucesso!', 201));
+    return res.status(201).json(successResponse({ usuario, token: novo.token }, 'UsuÃ¡rio criado com sucesso!', 201));
   } catch (e) {
-    const status = e?.status || 500;
-    const mensagem = e?.mensagem || 'Erro ao registrar usuário.';
-    return res.status(status).json(errorResponse(status, mensagem));
+    const status = e?.status || 500; const mensagem = e?.mensagem || 'Erro ao registrar usuário.'; const codigo = e?.codigo; const detalhes = e?.detalhes; return res.status(status).json(errorResponse(status, mensagem, codigo, detalhes));
   }
 };
 
 /**
- * Controller de Alteração de Senha
+ * Controller de AlteraÃ§Ã£o de Senha
  * Protegido por JWT. Requer { senhaAtual, novaSenha }.
  */
 export const changePassword = async (req, res) => {
@@ -93,18 +89,16 @@ export const changePassword = async (req, res) => {
   const userId = req.user?.id;
 
   if (!userId) {
-    return res.status(401).json(errorResponse(401, 'Não autenticado'));
+    return res.status(401).json(errorResponse(401, 'Não autenticado', 'ERR_NAO_AUTENTICADO'));
   }
   if (!senhaAtual || !novaSenha) {
-    return res.status(400).json(errorResponse(400, 'Campos obrigatórios: senhaAtual e novaSenha'));
+    return res.status(400).json(errorResponse(400, 'Campos obrigatórios: senhaAtual e novaSenha', 'ERR_VALIDACAO_CAMPOS'));
   }
   try {
     await authChangePassword(userId, senhaAtual, novaSenha);
     return res.status(200).json(successResponse(true, 'Senha alterada com sucesso', 200));
   } catch (e) {
-    const status = e?.status || 500;
-    const mensagem = e?.mensagem || 'Erro ao alterar senha';
-    return res.status(status).json(errorResponse(status, mensagem));
+    const status = e?.status || 500; const mensagem = e?.mensagem || 'Erro ao alterar senha'; const codigo = e?.codigo; const detalhes = e?.detalhes; return res.status(status).json(errorResponse(status, mensagem, codigo, detalhes));
   }
 };
 
@@ -128,14 +122,13 @@ export const forgotPassword = async (req, res) => {
 export const resetPassword = async (req, res) => {
   const { token, novaSenha } = req.body || {};
   if (!token || !novaSenha) {
-    return res.status(400).json(errorResponse(400, 'Campos obrigatórios: token e novaSenha'));
+    return res.status(400).json(errorResponse(400, 'Campos obrigatórios: senhaAtual e novaSenha', 'ERR_VALIDACAO_CAMPOS'));
   }
   try {
     await authResetPassword(token, novaSenha);
     return res.status(200).json(successResponse(true, 'Senha redefinida com sucesso', 200));
   } catch (e) {
-    const status = e?.status || 500;
-    const mensagem = e?.mensagem || 'Erro ao redefinir senha';
-    return res.status(status).json(errorResponse(status, mensagem));
+    const status = e?.status || 500; const mensagem = e?.mensagem || 'Erro ao redefinir senha'; const codigo = e?.codigo; const detalhes = e?.detalhes; return res.status(status).json(errorResponse(status, mensagem, codigo, detalhes));
   }
 };
+
