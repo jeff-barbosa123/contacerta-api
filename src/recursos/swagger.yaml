@@ -49,13 +49,19 @@ components:
         type: integer
         example: 1
 
-  schemas:
     ErroPadrao:
       type: object
       properties:
-        sucesso: { type: boolean, example: false }
-        status: { type: integer, example: 400 }
-        mensagem: { type: string, example: "Campos obrigat├│rios ausentes" }
+        success: { type: boolean, example: false }
+        codigo: { type: string, example: "ERR_VALIDACAO_CAMPOS" }
+        mensagem: { type: string, example: "Um ou mais campos estão inválidos ou ausentes." }
+        detalhes:
+          type: array
+          items:
+            type: object
+            properties:
+              campo: { type: string, example: "nome" }
+              erro: { type: string, example: "Obrigatório" }
         timestamp: { type: string, example: "2025-10-29T12:00:00.000Z" }
 
     UsuarioLogin:
@@ -68,8 +74,7 @@ components:
     UsuarioLoginResposta:
       type: object
       properties:
-        sucesso: { type: boolean, example: true }
-        status: { type: integer, example: 200 }
+        success: { type: boolean, example: true }
         mensagem: { type: string, example: "Login realizado com sucesso!" }
         data:
           type: object
