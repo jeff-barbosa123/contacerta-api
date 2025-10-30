@@ -254,7 +254,7 @@ paths:
       responses:
         "200":`n          description: OK`n          content:`n            application/json:`n              example:`n                success: true`n                mensagem: Login realizado com sucesso!`n                data:`n                  usuario: { id: 1, nome: Administrador, email: admin@contacerta.com }`n                  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         "400": { description: Requisi├º├úo inv├ílida, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "401": { description: Credenciais incorretas, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401":`n          description: Não autenticado ou token inválido`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_AUTENTICADO`n                mensagem: Token ausente, inválido ou expirado. } } }
         "500": { description: Erro interno, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
 
   /api/auth/register:
@@ -285,7 +285,7 @@ paths:
       responses:
         "200":`n          description: Senha alterada com sucesso`n          content:`n            application/json:`n              example:`n                success: true`n                mensagem: Senha alterada com sucesso`n                data: { }
         "400": { description: Requisi├º├úo inv├ílida (campos faltando ou senha fraca), content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "401": { description: N├úo autenticado ou senha atual incorreta, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401":`n          description: Não autenticado ou token inválido`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_AUTENTICADO`n                mensagem: Token ausente, inválido ou expirado. } } }
         "500": { description: Erro interno, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
 
   /api/auth/forgot-password:
@@ -314,7 +314,7 @@ paths:
       responses:
         "200":`n          description: Senha redefinida com sucesso`n          content:`n            application/json:`n              example:`n                success: true`n                mensagem: Senha redefinida com sucesso`n                data: { }
         "400": { description: Requisi├º├úo inv├ílida (campos faltando ou senha fraca), content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "401": { description: Token inv├ílido ou expirado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401":`n          description: Não autenticado ou token inválido`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_AUTENTICADO`n                mensagem: Token ausente, inválido ou expirado. } } }
         "500": { description: Erro interno, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
 
   # CLIENTES
@@ -332,7 +332,7 @@ paths:
               schema:
                 type: array
                 items: { $ref: "#/components/schemas/Cliente" }
-        "401": { description: Token ausente ou inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401":`n          description: Não autenticado ou token inválido`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_AUTENTICADO`n                mensagem: Token ausente, inválido ou expirado. } } }
     post:
       tags: [clientes]
       summary: Cadastra novo cliente
@@ -346,7 +346,7 @@ paths:
       responses:
         "201":`n          description: Cliente criado`n          content:`n            application/json:`n              example:`n                success: true`n                mensagem: Cliente criado com sucesso`n                data:`n                  id: 10`n                  nome: João da Silva`n                  telefone: "(81) 97777-6666"`n                  aniversario: "1985-11-12"
         "400": { description: Requisi├º├úo inv├ílida, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "401": { description: Token ausente ou inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401":`n          description: Não autenticado ou token inválido`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_AUTENTICADO`n                mensagem: Token ausente, inválido ou expirado. } } }
 
   /api/clientes/{id}:
     get:
@@ -357,8 +357,8 @@ paths:
         - $ref: "#/components/parameters/IdPath"
       responses:
         "200":`n          description: Cliente encontrado`n          content:`n            application/json:`n              example:`n                success: true`n                mensagem: Cliente encontrado`n                data:`n                  id: 1`n                  nome: Maria Souza`n                  telefone: "(81) 98888-7777"`n                  aniversario: "1990-03-25"
-        "401": { description: Token inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "404": { description: Cliente n├úo encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401":`n          description: Não autenticado ou token inválido`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_AUTENTICADO`n                mensagem: Token ausente, inválido ou expirado. } } }
+        "404":`n          description: Recurso não encontrado`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_ENCONTRADO`n                mensagem: Recurso não encontrado. } } }
     put:
       tags: [clientes]
       summary: Atualiza dados do cliente
@@ -373,7 +373,7 @@ paths:
       responses:
         "200": { description: Cliente atualizado, content: { application/json: { schema: { $ref: "#/components/schemas/Cliente" } } } }
         "400": { description: Requisi├º├úo inv├ílida, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "404": { description: Cliente n├úo encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "404":`n          description: Recurso não encontrado`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_ENCONTRADO`n                mensagem: Recurso não encontrado. } } }
     patch:
       tags: [clientes]
       summary: Atualiza parcialmente os dados do cliente
@@ -388,7 +388,7 @@ paths:
       responses:
         "200": { description: Cliente atualizado parcialmente, content: { application/json: { schema: { $ref: "#/components/schemas/Cliente" } } } }
         "400": { description: Requisi├º├úo inv├ílida, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "404": { description: Cliente n├úo encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "404":`n          description: Recurso não encontrado`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_ENCONTRADO`n                mensagem: Recurso não encontrado. } } }
     delete:
       tags: [clientes]
       summary: Remove cliente
@@ -397,8 +397,8 @@ paths:
         - $ref: "#/components/parameters/IdPath"
       responses:
         "200": { description: Cliente removido }
-        "401": { description: Token inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "404": { description: Cliente n├úo encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401":`n          description: Não autenticado ou token inválido`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_AUTENTICADO`n                mensagem: Token ausente, inválido ou expirado. } } }
+        "404":`n          description: Recurso não encontrado`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_ENCONTRADO`n                mensagem: Recurso não encontrado. } } }
 
   # PRODUTOS
   /api/produtos:
@@ -418,7 +418,7 @@ paths:
                 data:
                   items:
                     - { id: 1, nome: "Bolo de Rolo", custo: 12.5, preco: 25.0, estoque: 30 }
-        "401": { description: Token ausente ou inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401":`n          description: Não autenticado ou token inválido`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_AUTENTICADO`n                mensagem: Token ausente, inválido ou expirado. } } }
     post:
       tags: [produtos]
       summary: Cadastra novo produto
@@ -444,7 +444,7 @@ paths:
                   preco: 25
                   estoque: 30
         "400": { description: Requisi├º├úo inv├ílida, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "401": { description: Token ausente ou inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401":`n          description: Não autenticado ou token inválido`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_AUTENTICADO`n                mensagem: Token ausente, inválido ou expirado. } } }
 
   /api/produtos/{id}:
     get:
@@ -467,8 +467,8 @@ paths:
                   custo: 12.5
                   preco: 25
                   estoque: 30
-        "404": { description: Produto n├úo encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "401": { description: Token ausente ou inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "404":`n          description: Recurso não encontrado`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_ENCONTRADO`n                mensagem: Recurso não encontrado. } } }
+        "401":`n          description: Não autenticado ou token inválido`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_AUTENTICADO`n                mensagem: Token ausente, inválido ou expirado. } } }
     put:
       tags: [produtos]
       summary: Atualiza produto
@@ -488,7 +488,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProdutoUpdateResultado"
         "400": { description: Requisi├º├úo inv├ílida, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "401": { description: Token ausente ou inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401":`n          description: Não autenticado ou token inválido`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_AUTENTICADO`n                mensagem: Token ausente, inválido ou expirado. } } }
     patch:
       tags: [produtos]
       summary: Atualiza parcialmente produto
@@ -503,7 +503,7 @@ paths:
       responses:
         "200": { description: Produto atualizado parcialmente }
         "400": { description: Requisi├º├úo inv├ílida, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "401": { description: Token ausente ou inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401":`n          description: Não autenticado ou token inválido`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_AUTENTICADO`n                mensagem: Token ausente, inválido ou expirado. } } }
     delete:
       tags: [produtos]
       summary: Remove produto
@@ -512,8 +512,8 @@ paths:
         - $ref: "#/components/parameters/IdPath"
       responses:
         "200": { description: Produto removido }
-        "401": { description: Token ausente ou inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "404": { description: Produto n├úo encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401":`n          description: Não autenticado ou token inválido`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_AUTENTICADO`n                mensagem: Token ausente, inválido ou expirado. } } }
+        "404":`n          description: Recurso não encontrado`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_ENCONTRADO`n                mensagem: Recurso não encontrado. } } }
 
   # PEDIDOS
   /api/pedidos:
@@ -533,7 +533,7 @@ paths:
                 data:
                   items:
                     - { id: 1, cliente_id: 1, total: 50.0 }
-        "401": { description: Token ausente ou inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401":`n          description: Não autenticado ou token inválido`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_AUTENTICADO`n                mensagem: Token ausente, inválido ou expirado. } } }
     post:
       tags: [pedidos]
       summary: Cria novo pedido
@@ -547,8 +547,8 @@ paths:
       responses:
         "201":`n          description: Pedido criado. Pode incluir avisos de estoque baixo.`n          content:`n            application/json:`n              example:`n                success: true`n                mensagem: Pedido criado com sucesso`n                avisosEstoque: ["⚠️ Produto Arroz com estoque baixo (4 unidades)."]`n                data:`n                  pedidoId: 123`n                  total: 89.9
         "400": { description: Requisi├º├úo inv├ílida (ex.: itens ausentes ou produto inexistente), content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "401": { description: Token ausente ou inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "422": { description: Estoque insuficiente, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401":`n          description: Não autenticado ou token inválido`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_AUTENTICADO`n                mensagem: Token ausente, inválido ou expirado. } } }
+        "422":`n          description: Regra de negócio violada`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NEGOCIO`n                mensagem: Regra de negócio violada. } } }
 
   /api/pedidos/{id}:
     get:
@@ -559,8 +559,8 @@ paths:
         - $ref: "#/components/parameters/IdPath"
       responses:
         "200":`n          description: Pedido encontrado`n          content:`n            application/json:`n              example:`n                success: true`n                mensagem: OK`n                data:`n                  id: 1`n                  cliente_id: 1`n                  itens: [ { produto_id: 1, quantidade: 2 } ]`n                  total: 50
-        "401": { description: Token ausente ou inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "404": { description: Pedido n├úo encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401":`n          description: Não autenticado ou token inválido`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_AUTENTICADO`n                mensagem: Token ausente, inválido ou expirado. } } }
+        "404":`n          description: Recurso não encontrado`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_ENCONTRADO`n                mensagem: Recurso não encontrado. } } }
 
   # RELAT├ôRIOS
   /api/relatorios/cmv:
@@ -571,7 +571,11 @@ paths:
         - $ref: "#/components/parameters/Authorization"
       responses:
         "200":`n          description: OK`n          content:`n            application/json:`n              example:`n                success: true`n                mensagem: Relatório de CMV gerado com sucesso`n                data:`n                  cmv_total: 2450.75`n                  cmv_base: 312.00`n                  lucro_bruto_total: 1180.50`n                  lucro_percentual: 48.2
-        "401": { description: Token ausente ou inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401":`n          description: Não autenticado ou token inválido`n          content:`n            application/json:`n              example:`n                success: false`n                codigo: ERR_NAO_AUTENTICADO`n                mensagem: Token ausente, inválido ou expirado. } } }
+
+
+
+
 
 
 
