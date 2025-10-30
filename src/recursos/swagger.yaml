@@ -201,7 +201,18 @@ components:
       properties:
         cmv_total: { type: number, example: 1500.75 }
         cmv_base: { type: number, example: 12.5 }
+        lucro_bruto_total: { type: number, example: 980.50 }
+        lucro_percentual: { type: number, example: 65.33, description: "(lucro_bruto_total / cmv_total) * 100" }
         periodo: { type: string, nullable: true, example: "2025-10" }
+
+    ProdutoUpdateResultado:
+      type: object
+      properties:
+        updated: { type: boolean, example: true }
+        sugestao:
+          type: string
+          nullable: true
+          example: "O custo aumentou. Considere revisar o preco de venda."
 
     RelatorioRendimentoItem:
       type: object
@@ -438,7 +449,12 @@ paths:
           application/json:
             schema: { $ref: "#/components/schemas/ProdutoInput" }
       responses:
-        "200": { description: Produto atualizado }
+        "200":
+          description: Produto atualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProdutoUpdateResultado"
         "400": { description: Requisição inválida, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
         "401": { description: Token ausente ou inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
     patch:
@@ -494,7 +510,8 @@ paths:
           application/json:
             schema: { $ref: "#/components/schemas/PedidoInput" }
       responses:
-        "201": { description: Pedido criado }
+        "201":
+          description: Pedido criado. Pode incluir mensagens de estoque baixo em data.mensagens (quando aplicável)
         "400": { description: Requisição inválida (ex.: itens ausentes ou produto inexistente), content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
         "401": { description: Token ausente ou inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
         "422": { description: Estoque insuficiente, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }

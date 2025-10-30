@@ -1,6 +1,6 @@
 {
   "name": "contacerta-api",
-  "version": "3.1.0",
+  "version": "2.1.0",
   "description": "API RESTful ContaCerta — Gestão financeira e controle de vendas para microempreendedores.",
   "type": "module",
   "main": "src/server.js",

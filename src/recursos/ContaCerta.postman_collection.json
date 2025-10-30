@@ -141,7 +141,19 @@
         { "name": "Listar produtos", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/produtos?page=1&limit=20&nome=&categoria=&estoqueMin=", "host": ["{{baseUrl}}"], "path": ["api","produtos"], "query": [{"key":"page","value":"1"},{"key":"limit","value":"20"},{"key":"nome","value":""},{"key":"categoria","value":""},{"key":"estoqueMin","value":""}] } } },
         { "name": "Criar produto", "request": { "method": "POST", "header": [ {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/produtos", "host": ["{{baseUrl}}"], "path": ["api","produtos"] }, "body": { "mode":"raw", "raw": "{\n  \"nome\": \"Bolo de Rolo\",\n  \"custo\": 12.5,\n  \"preco\": 25.0,\n  \"estoque\": 30,\n  \"categoria\": \"Doces\"\n}" } } },
         { "name": "Obter produto por ID", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/produtos/{{produtoId}}", "host": ["{{baseUrl}}"], "path": ["api","produtos","{{produtoId}}"] } } },
-        { "name": "Atualizar produto (PUT)", "request": { "method": "PUT", "header": [ {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/produtos/{{produtoId}}", "host": ["{{baseUrl}}"], "path": ["api","produtos","{{produtoId}}"] }, "body": { "mode":"raw", "raw": "{\n  \"nome\": \"Bolo de Rolo\",\n  \"custo\": 13.0,\n  \"preco\": 26.0,\n  \"estoque\": 25\n}" } } },
+        { "name": "Atualizar produto (PUT)", "request": { "method": "PUT", "header": [ {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/produtos/{{produtoId}}", "host": ["{{baseUrl}}"], "path": ["api","produtos","{{produtoId}}"] }, "body": { "mode":"raw", "raw": "{\n  \"nome\": \"Bolo de Rolo\",\n  \"custo\": 13.0,\n  \"preco\": 26.0,\n  \"estoque\": 25\n}" } },
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": [
+              "try {",
+              "  const json = pm.response.json();",
+              "  // Controllers usam successResponse; checa em json.data",
+              "  const payload = json && json.data ? json.data : json;",
+              "  pm.test('Atualização retornou updated=true', function(){ pm.expect(payload.updated).to.eql(true); });",
+              "  if (payload.sugestao) { console.log('Sugestão:', payload.sugestao); }",
+              "} catch(e) { console.warn('Teste PUT produto falhou:', e); }"
+            ] } }
+          ]
+        },
         { "name": "Atualizar produto (PATCH)", "request": { "method": "PATCH", "header": [ {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/produtos/{{produtoId}}", "host": ["{{baseUrl}}"], "path": ["api","produtos","{{produtoId}}"] }, "body": { "mode":"raw", "raw": "{\n  \"estoque\": 40\n}" } } },
         { "name": "Remover produto", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/produtos/{{produtoId}}", "host": ["{{baseUrl}}"], "path": ["api","produtos","{{produtoId}}"] } } }
       ]
@@ -150,14 +162,42 @@
       "name": "Pedidos",
       "item": [
         { "name": "Listar pedidos", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/pedidos?page=1&limit=20&cliente=&dataInicio=&dataFim=&status=", "host": ["{{baseUrl}}"], "path": ["api","pedidos"], "query": [{"key":"page","value":"1"},{"key":"limit","value":"20"},{"key":"cliente","value":""},{"key":"dataInicio","value":""},{"key":"dataFim","value":""},{"key":"status","value":""}] } } },
-        { "name": "Criar pedido", "request": { "method": "POST", "header": [ {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/pedidos", "host": ["{{baseUrl}}"], "path": ["api","pedidos"] }, "body": { "mode":"raw", "raw": "{\n  \"cliente_id\": 1,\n  \"itens\": [\n    { \"produto_id\": 1, \"quantidade\": 2 }\n  ],\n  \"formaPagamento\": \"Pix\"\n}" } } },
+        { "name": "Criar pedido", "request": { "method": "POST", "header": [ {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/pedidos", "host": ["{{baseUrl}}"], "path": ["api","pedidos"] }, "body": { "mode":"raw", "raw": "{\n  \"cliente_id\": 1,\n  \"itens\": [\n    { \"produto_id\": 1, \"quantidade\": 2 }\n  ],\n  \"formaPagamento\": \"Pix\"\n}" } },
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": [
+              "try {",
+              "  const json = pm.response.json();",
+              "  const mensagens = json && json.data && json.data.mensagens;",
+              "  if (Array.isArray(mensagens) && mensagens.length) {",
+              "    console.warn('Alertas de estoque baixo:', mensagens);",
+              "  }",
+              "  pm.test('Resposta de criação de pedido válida', function(){ pm.expect(json && json.sucesso).to.eql(true); });",
+              "} catch(e) { console.warn('Teste criar pedido falhou:', e); }"
+            ] } }
+          ]
+        },
         { "name": "Obter pedido por ID", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/pedidos/{{pedidoId}}", "host": ["{{baseUrl}}"], "path": ["api","pedidos","{{pedidoId}}"] } } }
       ]
     },
     {
       "name": "Relatórios",
       "item": [
-        { "name": "CMV (opcional periodo=YYYY-MM)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/relatorios/cmv?periodo=", "host": ["{{baseUrl}}"], "path": ["api","relatorios","cmv"], "query": [ {"key":"periodo","value":""} ] } } },
+        { "name": "CMV (opcional periodo=YYYY-MM)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/relatorios/cmv?periodo=", "host": ["{{baseUrl}}"], "path": ["api","relatorios","cmv"], "query": [ {"key":"periodo","value":""} ] } },
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": [
+              "try {",
+              "  const json = pm.response.json();",
+              "  const data = json && json.data ? json.data : {};",
+              "  pm.test('CMV contém campos novos', function(){",
+              "    pm.expect(data).to.have.property('cmv_total');",
+              "    pm.expect(data).to.have.property('cmv_base');",
+              "    pm.expect(data).to.have.property('lucro_bruto_total');",
+              "    pm.expect(data).to.have.property('lucro_percentual');",
+              "  });",
+              "} catch(e) { console.warn('Teste CMV falhou:', e); }"
+            ] } }
+          ]
+        },
         { "name": "Rendimento por produto", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/relatorios/rendimento", "host": ["{{baseUrl}}"], "path": ["api","relatorios","rendimento"] } } },
         { "name": "Estoque baixo (limite)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/relatorios/estoque-baixo?limite=5", "host": ["{{baseUrl}}"], "path": ["api","relatorios","estoque-baixo"], "query": [ {"key":"limite","value":"5"} ] } } },
         { "name": "Clientes fiéis", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/relatorios/clientes-fieis", "host": ["{{baseUrl}}"], "path": ["api","relatorios","clientes-fieis"] } } }

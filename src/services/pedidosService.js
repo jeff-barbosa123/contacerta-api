@@ -6,6 +6,7 @@ import { obterPorId as obterProduto } from './produtoService.js';
  */
 function calcularTotaisEAtualizarEstoque(itens) {
   let total = 0;
+  const avisos = [];
   for (const item of itens) {
     const prod = db.produtos.find(p => p.id === item.produto_id);
     if (!prod) throw new Error(`Produto ${item.produto_id} não encontrado.`);
@@ -19,9 +20,16 @@ function calcularTotaisEAtualizarEstoque(itens) {
   for (const item of itens) {
     const prod = db.produtos.find(p => p.id === item.produto_id);
     prod.estoque -= Number(item.quantidade);
+    // Novo: quando estoque ficar <= 5, gera aviso e registra no console
+    if (Number(prod.estoque) <= 5) {
+      const msg = `AVISO: Produto ${prod.nome} está com estoque baixo (${prod.estoque} unidades)`;
+      console.warn(msg);
+      avisos.push(`Estoque baixo para ${prod.nome}`);
+    }
   }
 
-  return total;
+  // Novo: retorna total e lista de avisos de estoque baixo
+  return { total, avisos };
 }
 
 /**
@@ -53,7 +61,8 @@ export async function criar(data) {
       if (!prod) throw new Error(`Produto ${it.produto_id} não encontrado.`);
     }
 
-    const total = calcularTotaisEAtualizarEstoque(itens);
+    // Novo: captura avisos de estoque baixo ao criar o pedido
+    const { total, avisos } = calcularTotaisEAtualizarEstoque(itens);
     const pedido = {
       id: nextId('pedidos'),
       cliente_id: Number(cliente_id),
@@ -68,7 +77,8 @@ export async function criar(data) {
     };
 
     db.pedidos.push(pedido);
-    return { success: true, message: 'Pedido criado com sucesso.', data: pedido };
+    // Novo: inclui mensagens de alerta na resposta do service (não bloqueia)
+    return { success: true, message: 'Pedido criado com sucesso.', data: pedido, mensagens: avisos };
   } catch (error) {
     console.error('[PedidosService] Erro ao criar pedido:', error);
     return { success: false, message: error.message };

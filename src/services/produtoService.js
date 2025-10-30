@@ -43,6 +43,7 @@ export async function obterPorId(id) {
 export async function atualizarCompleto(id, data) {
   const i = db.produtos.findIndex(p => p.id === id);
   if (i < 0) return false;
+  const antigo = { ...db.produtos[i] };
   const patch = { ...data };
   if (patch.custo !== undefined) {
     const v = Number(patch.custo); if (Number.isNaN(v) || v < 0) throw Object.assign(new Error('custo inválido'), { status: 400 }); patch.custo = v;
@@ -54,7 +55,11 @@ export async function atualizarCompleto(id, data) {
     const v = Number(patch.estoque); if (Number.isNaN(v) || v < 0) throw Object.assign(new Error('estoque inválido'), { status: 400 }); patch.estoque = v;
   }
   db.produtos[i] = { ...db.produtos[i], ...patch };
-  return true;
+  let sugestao;
+  if (patch.custo !== undefined && Number(patch.custo) > Number(antigo.custo)) {
+    sugestao = 'O custo aumentou. Considere revisar o preço de venda.';
+  }
+  return sugestao ? { updated: true, sugestao } : { updated: true };
 }
 
 export async function atualizarParcial(id, data) {

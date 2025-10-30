@@ -7,15 +7,30 @@ export async function cmv(periodo) {
     return iso.startsWith(periodo); // YYYY-MM
   };
   let cmv_total = 0;
+  let lucro_bruto_total = 0; // novo: soma de (preço_venda - custo_unitário) × quantidade
   for (const ped of db.pedidos) {
     if (!filtrarPorPeriodo(ped.criadoEm)) continue;
     for (const it of ped.itens) {
       const prod = db.produtos.find(p => p.id === it.produto_id);
       if (!prod) continue;
-      cmv_total += Number(prod.custo) * Number(it.quantidade);
+      const qtd = Number(it.quantidade);
+      cmv_total += Number(prod.custo) * qtd;
+      lucro_bruto_total += Number(prod.preco - prod.custo) * qtd;
     }
   }
-  return { cmv_total: Number(cmv_total.toFixed(2)), cmv_base: db.produtos.length ? Number((db.produtos.reduce((a, p) => a + p.custo, 0) / db.produtos.length).toFixed(2)) : 0, periodo: periodo || null };
+  const cmv_total_fmt = Number(cmv_total.toFixed(2));
+  const cmv_base = db.produtos.length ? Number((db.produtos.reduce((a, p) => a + p.custo, 0) / db.produtos.length).toFixed(2)) : 0;
+  const lucro_bruto_total_fmt = Number(lucro_bruto_total.toFixed(2));
+  const lucro_percentual = cmv_total_fmt > 0 ? Number(((lucro_bruto_total_fmt / cmv_total_fmt) * 100).toFixed(2)) : 0;
+
+  // novo: adiciona lucro_bruto_total e lucro_percentual (com zeros quando não houver pedidos)
+  return {
+    cmv_total: cmv_total_fmt,
+    cmv_base,
+    lucro_bruto_total: lucro_bruto_total_fmt,
+    lucro_percentual,
+    periodo: periodo || null
+  };
 }
 
 // Rendimento por produto: custo, preço, lucro unitário, margem %, rendimento total (lucro * qtd vendida)

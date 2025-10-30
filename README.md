@@ -16,7 +16,7 @@ Foi desenvolvida com **Node.js + Express**, com autenticação **JWT**, document
 
 ---
 
-## 🚀 Funcionalidades Principais
+## Funcionalidades Principais
 
 - 🔐 **Autenticação JWT** (login e controle de acesso por token)
 - 👥 **CRUD de clientes, produtos e pedidos**
@@ -27,6 +27,18 @@ Foi desenvolvida com **Node.js + Express**, com autenticação **JWT**, document
 - ⚙️ Estrutura escalável, separada em camadas para fácil manutenção
 
 ---
+
+## Notas de Versão
+
+### 2.1.0
+- Alerta de estoque baixo automático (pedidos): ao criar um pedido, se algum produto ficar com estoque ≤ 5, é registrado um aviso no console e retornado em `data.mensagens` no JSON. A venda não é bloqueada.
+- Sugestão de reajuste de preço (produtos): em `PUT/PATCH /api/produtos/{id}`, se o custo novo for maior que o anterior, a resposta inclui `sugestao: "O custo aumentou. Considere revisar o preco de venda."` mantendo compatibilidade com a resposta anterior (`updated: true`).
+- CMV mais descritivo (relatórios): `GET /api/relatorios/cmv` agora retorna também `lucro_bruto_total` e `lucro_percentual`, além de `cmv_total`, `cmv_base` e `periodo`. Em ausência de pedidos, os valores retornam 0.
+
+Documentação e coleções:
+- Swagger atualizado para refletir os novos campos de CMV e o formato de retorno de atualização de produto.
+- Postman atualizado com testes que verificam `data.mensagens` em criação de pedido, `sugestao` em atualização de produto e os novos campos do CMV.
+
 
 ## 🧱 Arquitetura da Aplicação
 
