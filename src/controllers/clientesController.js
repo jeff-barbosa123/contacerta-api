@@ -1,4 +1,4 @@
-import * as clientes from '../services/clienteService.js';
+﻿import * as clientes from '../services/clienteService.js';
 import { successResponse, errorResponse } from '../utils/responses.js';
 
 /**
@@ -33,13 +33,13 @@ export async function criar(req, res, next) {
 }
 
 /**
- * Obtém um cliente específico pelo ID
+ * ObtÃ©m um cliente especÃ­fico pelo ID
  */
 export async function obterPorId(req, res, next) {
   try {
     const item = await clientes.obterPorId(Number(req.params.id));
     if (!item) {
-      return res.status(404).json(errorResponse(404, 'Cliente não encontrado'));
+      return res.status(404).json(errorResponse(404, 'Cliente não encontrado', 'ERR_CLIENTE_INEXISTENTE'));
     }
     return res.status(200).json(successResponse(item, 'Cliente encontrado'));
   } catch (e) {
@@ -54,7 +54,7 @@ export async function atualizarCompleto(req, res, next) {
   try {
     const ok = await clientes.atualizarCompleto(Number(req.params.id), req.body);
     if (!ok) {
-      return res.status(404).json(errorResponse(404, 'Cliente não encontrado'));
+      return res.status(404).json(errorResponse(404, 'Cliente não encontrado', 'ERR_CLIENTE_INEXISTENTE'));
     }
     return res.status(200).json(successResponse(ok, 'Cliente atualizado com sucesso'));
   } catch (e) {
@@ -69,7 +69,7 @@ export async function atualizarParcial(req, res, next) {
   try {
     const ok = await clientes.atualizarParcial(Number(req.params.id), req.body);
     if (!ok) {
-      return res.status(404).json(errorResponse(404, 'Cliente não encontrado'));
+      return res.status(404).json(errorResponse(404, 'Cliente não encontrado', 'ERR_CLIENTE_INEXISTENTE'));
     }
     return res.status(200).json(successResponse(ok, 'Cliente atualizado (parcialmente)'));
   } catch (e) {
@@ -84,10 +84,11 @@ export async function remover(req, res, next) {
   try {
     const ok = await clientes.remover(Number(req.params.id));
     if (!ok) {
-      return res.status(404).json(errorResponse(404, 'Cliente não encontrado'));
+      return res.status(404).json(errorResponse(404, 'Cliente não encontrado', 'ERR_CLIENTE_INEXISTENTE'));
     }
     return res.status(200).json(successResponse(true, 'Cliente removido com sucesso'));
   } catch (e) {
     next(e);
   }
 }
+

@@ -1,4 +1,4 @@
-import * as produtos from '../services/produtoService.js';
+﻿import * as produtos from '../services/produtoService.js';
 import { successResponse, errorResponse } from '../utils/responses.js';
 
 /**
@@ -34,13 +34,13 @@ export async function criar(req, res, next) {
 }
 
 /**
- * Obtém um produto pelo ID
+ * ObtÃ©m um produto pelo ID
  */
 export async function obterPorId(req, res, next) {
   try {
     const item = await produtos.obterPorId(Number(req.params.id));
     if (!item) {
-      return res.status(404).json(errorResponse(404, 'Produto não encontrado'));
+      return res.status(404).json(errorResponse(404, 'Produto não encontrado', 'ERR_PRODUTO_INEXISTENTE'));
     }
     return res.status(200).json(successResponse(item, 'Produto encontrado'));
   } catch (e) {
@@ -55,7 +55,7 @@ export async function atualizarCompleto(req, res, next) {
   try {
     const ok = await produtos.atualizarCompleto(Number(req.params.id), req.body);
     if (!ok) {
-      return res.status(404).json(errorResponse(404, 'Produto não encontrado'));
+      return res.status(404).json(errorResponse(404, 'Produto não encontrado', 'ERR_PRODUTO_INEXISTENTE'));
     }
     return res.status(200).json(successResponse(ok, 'Produto atualizado com sucesso'));
   } catch (e) {
@@ -70,7 +70,7 @@ export async function atualizarParcial(req, res, next) {
   try {
     const ok = await produtos.atualizarParcial(Number(req.params.id), req.body);
     if (!ok) {
-      return res.status(404).json(errorResponse(404, 'Produto não encontrado'));
+      return res.status(404).json(errorResponse(404, 'Produto não encontrado', 'ERR_PRODUTO_INEXISTENTE'));
     }
     return res.status(200).json(successResponse(ok, 'Produto atualizado (parcialmente)'));
   } catch (e) {
@@ -85,10 +85,11 @@ export async function remover(req, res, next) {
   try {
     const ok = await produtos.remover(Number(req.params.id));
     if (!ok) {
-      return res.status(404).json(errorResponse(404, 'Produto não encontrado'));
+      return res.status(404).json(errorResponse(404, 'Produto não encontrado', 'ERR_PRODUTO_INEXISTENTE'));
     }
     return res.status(200).json(successResponse(true, 'Produto removido com sucesso'));
   } catch (e) {
     next(e);
   }
 }
+
