@@ -11,27 +11,31 @@ export async function listar({ nome, categoria, estoqueMin, page, limit }) {
 }
 
 export async function criar(data) {
-  if (!data || !data.nome || data.custo === undefined || data.preco === undefined || data.estoque === undefined) {
-    throw Object.assign(new Error('Campos obrigatÃ³rios: nome, custo, preco, estoque'), { status: 400 });
-  }
+  // 🆕 v2.1.0 – validações com códigos e detalhes
+  const missing = [];
+  if (!data || !data.nome) missing.push({ campo: 'nome', erro: 'Obrigatório' });
+  if (!data || data.custo === undefined) missing.push({ campo: 'custo', erro: 'Obrigatório' });
+  if (!data || data.preco === undefined) missing.push({ campo: 'preco', erro: 'Obrigatório' });
+  if (!data || data.estoque === undefined) missing.push({ campo: 'estoque', erro: 'Obrigatório' });
+  if (missing.length) { const e = new Error('Um ou mais campos estão inválidos ou ausentes.'); e.status = 400; e.codigo = 'ERR_VALIDACAO_CAMPOS'; e.detalhes = missing; throw e; }
+
   const custo = Number(data.custo);
   const preco = Number(data.preco);
   const estoque = Number(data.estoque);
-  if ([custo, preco, estoque].some(v => Number.isNaN(v))) {
-    throw Object.assign(new Error('custo, preco e estoque devem ser numÃ©ricos'), { status: 400 });
-  }
-  if (custo < 0 || preco < 0 || estoque < 0) {
-    throw Object.assign(new Error('custo, preco e estoque nÃ£o podem ser negativos'), { status: 400 });
-  }
+  const naoNumericos = [];
+  if (Number.isNaN(custo)) naoNumericos.push({ campo: 'custo', erro: 'Deve ser numérico' });
+  if (Number.isNaN(preco)) naoNumericos.push({ campo: 'preco', erro: 'Deve ser numérico' });
+  if (Number.isNaN(estoque)) naoNumericos.push({ campo: 'estoque', erro: 'Deve ser numérico' });
+  if (naoNumericos.length) { const e = new Error('Parâmetros inválidos.'); e.status = 400; e.codigo = 'ERR_PARAMETROS_INVALIDOS'; e.detalhes = naoNumericos; throw e; }
+
+  const negativos = [];
+  if (custo < 0) negativos.push({ campo: 'custo', erro: 'Não pode ser negativo' });
+  if (preco < 0) negativos.push({ campo: 'preco', erro: 'Não pode ser negativo' });
+  if (estoque < 0) negativos.push({ campo: 'estoque', erro: 'Não pode ser negativo' });
+  if (negativos.length) { const e = new Error('Parâmetros inválidos.'); e.status = 400; e.codigo = 'ERR_PARAMETROS_INVALIDOS'; e.detalhes = negativos; throw e; }
+
   const id = nextId('produtos');
-  const novo = {
-    id,
-    nome: data.nome,
-    custo,
-    preco,
-    estoque,
-    categoria: data.categoria || null
-  };
+  const novo = { id, nome: data.nome, custo, preco, estoque, categoria: data.categoria || null };
   db.produtos.push(novo);
   return novo;
 }
@@ -84,5 +88,6 @@ export async function remover(id) {
   db.produtos.splice(i, 1);
   return true;
 }
+
 
 
