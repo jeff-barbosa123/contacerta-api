@@ -1,8 +1,8 @@
-{
+﻿{
   "info": {
     "name": "API ContaCerta v3",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Coleção para testar a API ContaCerta v3. Variáveis: {{baseUrl}}, {{token}}, {{clienteId}}, {{produtoId}}, {{pedidoId}}."
+    "description": "ColeÃ§Ã£o para testar a API ContaCerta v3. VariÃ¡veis: {{baseUrl}}, {{token}}, {{clienteId}}, {{produtoId}}, {{pedidoId}}."
   },
   "item": [
     {
@@ -27,7 +27,7 @@
                   "  const json = pm.response.json();",
                   "  const t = json && json.data && json.data.token;",
                   "  if (t) { pm.collectionVariables.set('resetToken', t); }",
-                  "  // captura email usado na requisição para usar no login depois",
+                  "  // captura email usado na requisiÃ§Ã£o para usar no login depois",
                   "  try { const body = JSON.parse(pm.request.body.raw || '{}'); if (body.email) pm.collectionVariables.set('loginEmail', body.email); } catch(e2) {}",
                   "} catch (e) { console.warn('Falha ao capturar resetToken/loginEmail', e); }"
                 ]
@@ -51,10 +51,10 @@
                 "type": "text/javascript",
                 "exec": [
                   "try {",
-                  "  // guarda a nova senha como loginPassword e já aponta o próximo request para Login",
+                  "  // guarda a nova senha como loginPassword e jÃ¡ aponta o prÃ³ximo request para Login",
                   "  try { const body = JSON.parse(pm.request.body.raw || '{}'); if (body.novaSenha) pm.collectionVariables.set('loginPassword', body.novaSenha); } catch(e2) {}",
                   "  pm.setNextRequest('Login (gera token)');",
-                  "} catch (e) { console.warn('Falha ao preparar login pós-reset', e); }"
+                  "} catch (e) { console.warn('Falha ao preparar login pÃ³s-reset', e); }"
                 ]
               }
             }
@@ -88,7 +88,7 @@
           }
         },
         {
-          "name": "Registrar (novo usuário)",
+          "name": "Registrar (novo usuÃ¡rio)",
           "request": {
             "method": "POST",
             "header": [ { "key": "Content-Type", "value": "application/json" } ],
@@ -115,7 +115,7 @@
                   "try {",
                   "  const json = pm.response.json();",
                   "  const t = json && json.data && (json.data.token || (json.data.usuario && json.data.usuario.token));",
-                  "  if (t) { pm.collectionVariables.set('token', t); console.log('token definido na coleção'); }",
+                  "  if (t) { pm.collectionVariables.set('token', t); console.log('token definido na coleÃ§Ã£o'); }",
                   "} catch (e) { console.warn('Falha ao capturar token', e); }"
                 ]
               }
@@ -148,8 +148,8 @@
               "  const json = pm.response.json();",
               "  // Controllers usam successResponse; checa em json.data",
               "  const payload = json && json.data ? json.data : json;",
-              "  pm.test('Atualização retornou updated=true', function(){ pm.expect(payload.updated).to.eql(true); });",
-              "  if (payload.sugestao) { console.log('Sugestão:', payload.sugestao); }",
+              "  pm.test('AtualizaÃ§Ã£o retornou updated=true', function(){ pm.expect(payload.updated).to.eql(true); });",
+              "  if (payload.sugestao) { console.log('SugestÃ£o:', payload.sugestao); }",
               "} catch(e) { console.warn('Teste PUT produto falhou:', e); }"
             ] } }
           ]
@@ -171,7 +171,7 @@
               "  if (Array.isArray(mensagens) && mensagens.length) {",
               "    console.warn('Alertas de estoque baixo:', mensagens);",
               "  }",
-              "  pm.test('Resposta de criação de pedido válida', function(){ pm.expect(json && json.sucesso).to.eql(true); });",
+              "  pm.test('Resposta de criaÃ§Ã£o de pedido vÃ¡lida', function(){ pm.expect(json && json.success).to.eql(true); });",
               "} catch(e) { console.warn('Teste criar pedido falhou:', e); }"
             ] } }
           ]
@@ -180,7 +180,7 @@
       ]
     },
     {
-      "name": "Relatórios",
+      "name": "RelatÃ³rios",
       "item": [
         { "name": "CMV (opcional periodo=YYYY-MM)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/relatorios/cmv?periodo=", "host": ["{{baseUrl}}"], "path": ["api","relatorios","cmv"], "query": [ {"key":"periodo","value":""} ] } },
           "event": [
@@ -188,7 +188,7 @@
               "try {",
               "  const json = pm.response.json();",
               "  const data = json && json.data ? json.data : {};",
-              "  pm.test('CMV contém campos novos', function(){",
+              "  pm.test('CMV contÃ©m campos novos', function(){",
               "    pm.expect(data).to.have.property('cmv_total');",
               "    pm.expect(data).to.have.property('cmv_base');",
               "    pm.expect(data).to.have.property('lucro_bruto_total');",
@@ -200,7 +200,7 @@
         },
         { "name": "Rendimento por produto", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/relatorios/rendimento", "host": ["{{baseUrl}}"], "path": ["api","relatorios","rendimento"] } } },
         { "name": "Estoque baixo (limite)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/relatorios/estoque-baixo?limite=5", "host": ["{{baseUrl}}"], "path": ["api","relatorios","estoque-baixo"], "query": [ {"key":"limite","value":"5"} ] } } },
-        { "name": "Clientes fiéis", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/relatorios/clientes-fieis", "host": ["{{baseUrl}}"], "path": ["api","relatorios","clientes-fieis"] } } }
+        { "name": "Clientes fiÃ©is", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/relatorios/clientes-fieis", "host": ["{{baseUrl}}"], "path": ["api","relatorios","clientes-fieis"] } } }
       ]
     }
   ],
@@ -216,3 +216,4 @@
     { "key": "pedidoId",  "value": "1" }
   ]
 }
+
