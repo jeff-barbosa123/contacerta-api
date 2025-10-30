@@ -252,7 +252,7 @@ paths:
           application/json:
             schema: { $ref: "#/components/schemas/UsuarioLogin" }
       responses:
-        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/UsuarioLoginResposta" } } } }
+        "200":`n          description: OK`n          content:`n            application/json:`n              example:`n                success: true`n                mensagem: Login realizado com sucesso!`n                data:`n                  usuario: { id: 1, nome: Administrador, email: admin@contacerta.com }`n                  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         "400": { description: Requisi├º├úo inv├ílida, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
         "401": { description: Credenciais incorretas, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
         "500": { description: Erro interno, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
@@ -283,7 +283,7 @@ paths:
           application/json:
             schema: { $ref: "#/components/schemas/PasswordChangeInput" }
       responses:
-        "200": { description: Senha alterada com sucesso }
+        "200":`n          description: Senha alterada com sucesso`n          content:`n            application/json:`n              example:`n                success: true`n                mensagem: Senha alterada com sucesso`n                data: { }
         "400": { description: Requisi├º├úo inv├ílida (campos faltando ou senha fraca), content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
         "401": { description: N├úo autenticado ou senha atual incorreta, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
         "500": { description: Erro interno, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
@@ -312,7 +312,7 @@ paths:
           application/json:
             schema: { $ref: "#/components/schemas/ResetPasswordInput" }
       responses:
-        "200": { description: Senha redefinida com sucesso }
+        "200":`n          description: Senha redefinida com sucesso`n          content:`n            application/json:`n              example:`n                success: true`n                mensagem: Senha redefinida com sucesso`n                data: { }
         "400": { description: Requisi├º├úo inv├ílida (campos faltando ou senha fraca), content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
         "401": { description: Token inv├ílido ou expirado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
         "500": { description: Erro interno, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
@@ -344,7 +344,7 @@ paths:
           application/json:
             schema: { $ref: "#/components/schemas/ClienteInput" }
       responses:
-        "201": { description: Cliente criado, content: { application/json: { schema: { $ref: "#/components/schemas/Cliente" } } } }
+        "201":`n          description: Cliente criado`n          content:`n            application/json:`n              example:`n                success: true`n                mensagem: Cliente criado com sucesso`n                data:`n                  id: 10`n                  nome: João da Silva`n                  telefone: "(81) 97777-6666"`n                  aniversario: "1985-11-12"
         "400": { description: Requisi├º├úo inv├ílida, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
         "401": { description: Token ausente ou inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
 
@@ -356,7 +356,7 @@ paths:
         - $ref: "#/components/parameters/Authorization"
         - $ref: "#/components/parameters/IdPath"
       responses:
-        "200": { description: Cliente encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/Cliente" } } } }
+        "200":`n          description: Cliente encontrado`n          content:`n            application/json:`n              example:`n                success: true`n                mensagem: Cliente encontrado`n                data:`n                  id: 1`n                  nome: Maria Souza`n                  telefone: "(81) 98888-7777"`n                  aniversario: "1990-03-25"
         "401": { description: Token inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
         "404": { description: Cliente n├úo encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
     put:
@@ -572,6 +572,8 @@ paths:
       responses:
         "200":`n          description: OK`n          content:`n            application/json:`n              example:`n                success: true`n                mensagem: Relatório de CMV gerado com sucesso`n                data:`n                  cmv_total: 2450.75`n                  cmv_base: 312.00`n                  lucro_bruto_total: 1180.50`n                  lucro_percentual: 48.2
         "401": { description: Token ausente ou inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+
+
 
 
 
