@@ -1,0 +1,178 @@
+{
+  "info": {
+    "name": "API ContaCerta v3",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Coleção para testar a API ContaCerta v3. Variáveis: {{baseUrl}}, {{token}}, {{clienteId}}, {{produtoId}}, {{pedidoId}}."
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Esqueci minha senha (200)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "auth": { "type": "noauth" },
+            "url": { "raw": "{{baseUrl}}/api/auth/forgot-password", "host": ["{{baseUrl}}"], "path": ["api","auth","forgot-password"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"novo@contacerta.com\"\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const t = json && json.data && json.data.token;",
+                  "  if (t) { pm.collectionVariables.set('resetToken', t); }",
+                  "  // captura email usado na requisição para usar no login depois",
+                  "  try { const body = JSON.parse(pm.request.body.raw || '{}'); if (body.email) pm.collectionVariables.set('loginEmail', body.email); } catch(e2) {}",
+                  "} catch (e) { console.warn('Falha ao capturar resetToken/loginEmail', e); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Resetar senha (200)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "auth": { "type": "noauth" },
+            "url": { "raw": "{{baseUrl}}/api/auth/reset-password", "host": ["{{baseUrl}}"], "path": ["api","auth","reset-password"] },
+            "body": { "mode": "raw", "raw": "{\n  \"token\": \"{{resetToken}}\",\n  \"novaSenha\": \"NovaSenhaF0rte!\"\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  // guarda a nova senha como loginPassword e já aponta o próximo request para Login",
+                  "  try { const body = JSON.parse(pm.request.body.raw || '{}'); if (body.novaSenha) pm.collectionVariables.set('loginPassword', body.novaSenha); } catch(e2) {}",
+                  "  pm.setNextRequest('Login (gera token)');",
+                  "} catch (e) { console.warn('Falha ao preparar login pós-reset', e); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alterar senha (200)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/auth/change-password", "host": ["{{baseUrl}}"], "path": ["api","auth","change-password"] },
+            "body": { "mode": "raw", "raw": "{\n  \"senhaAtual\": \"SenhaForte123!\",\n  \"novaSenha\": \"NovaSenhaF0rte!\"\n}" }
+          }
+        },
+        {
+          "name": "Alterar senha - atual incorreta (401)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/auth/change-password", "host": ["{{baseUrl}}"], "path": ["api","auth","change-password"] },
+            "body": { "mode": "raw", "raw": "{\n  \"senhaAtual\": \"Errada123!\",\n  \"novaSenha\": \"NovaSenhaF0rte!\"\n}" }
+          }
+        },
+        {
+          "name": "Alterar senha - fraca (400)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/auth/change-password", "host": ["{{baseUrl}}"], "path": ["api","auth","change-password"] },
+            "body": { "mode": "raw", "raw": "{\n  \"senhaAtual\": \"SenhaForte123!\",\n  \"novaSenha\": \"fraca123\"\n}" }
+          }
+        },
+        {
+          "name": "Registrar (novo usuário)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "auth": { "type": "noauth" },
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] },
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Maria Souza\",\n  \"email\": \"novo@contacerta.com\",\n  \"senha\": \"SenhaForte123!\",\n  \"perfil\": \"user\"\n}" }
+          }
+        },
+        {
+          "name": "Login (gera token)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "auth": { "type": "noauth" },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{loginEmail}}\",\n  \"senha\": \"{{loginPassword}}\"\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const t = json && json.data && (json.data.token || (json.data.usuario && json.data.usuario.token));",
+                  "  if (t) { pm.collectionVariables.set('token', t); console.log('token definido na coleção'); }",
+                  "} catch (e) { console.warn('Falha ao capturar token', e); }"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Clientes",
+      "item": [
+        { "name": "Listar clientes", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/clientes?page=1&limit=20&nome=&aniversario=", "host": ["{{baseUrl}}"], "path": ["api","clientes"], "query": [{"key":"page","value":"1"},{"key":"limit","value":"20"},{"key":"nome","value":""},{"key":"aniversario","value":""}] } } },
+        { "name": "Criar cliente", "request": { "method": "POST", "header": [ {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/clientes", "host": ["{{baseUrl}}"], "path": ["api","clientes"] }, "body": { "mode":"raw", "raw": "{\n  \"nome\": \"Maria Souza\",\n  \"telefone\": \"(81) 98888-7777\",\n  \"aniversario\": \"1990-03-25\",\n  \"cpf_cnpj\": \"123.456.789-00\",\n  \"endereco\": \"Rua Exemplo, 123\"\n}" } } },
+        { "name": "Obter cliente por ID", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/clientes/{{clienteId}}", "host": ["{{baseUrl}}"], "path": ["api","clientes","{{clienteId}}"] } } },
+        { "name": "Atualizar cliente (PUT)", "request": { "method": "PUT", "header": [ {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/clientes/{{clienteId}}", "host": ["{{baseUrl}}"], "path": ["api","clientes","{{clienteId}}"] }, "body": { "mode":"raw", "raw": "{\n  \"nome\": \"Maria Souza\",\n  \"telefone\": \"(81) 98888-7777\",\n  \"aniversario\": \"1990-03-25\"\n}" } } },
+        { "name": "Atualizar cliente (PATCH)", "request": { "method": "PATCH", "header": [ {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/clientes/{{clienteId}}", "host": ["{{baseUrl}}"], "path": ["api","clientes","{{clienteId}}"] }, "body": { "mode":"raw", "raw": "{\n  \"telefone\": \"(81) 97777-6666\"\n}" } } },
+        { "name": "Remover cliente", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/clientes/{{clienteId}}", "host": ["{{baseUrl}}"], "path": ["api","clientes","{{clienteId}}"] } } }
+      ]
+    },
+    {
+      "name": "Produtos",
+      "item": [
+        { "name": "Listar produtos", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/produtos?page=1&limit=20&nome=&categoria=&estoqueMin=", "host": ["{{baseUrl}}"], "path": ["api","produtos"], "query": [{"key":"page","value":"1"},{"key":"limit","value":"20"},{"key":"nome","value":""},{"key":"categoria","value":""},{"key":"estoqueMin","value":""}] } } },
+        { "name": "Criar produto", "request": { "method": "POST", "header": [ {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/produtos", "host": ["{{baseUrl}}"], "path": ["api","produtos"] }, "body": { "mode":"raw", "raw": "{\n  \"nome\": \"Bolo de Rolo\",\n  \"custo\": 12.5,\n  \"preco\": 25.0,\n  \"estoque\": 30,\n  \"categoria\": \"Doces\"\n}" } } },
+        { "name": "Obter produto por ID", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/produtos/{{produtoId}}", "host": ["{{baseUrl}}"], "path": ["api","produtos","{{produtoId}}"] } } },
+        { "name": "Atualizar produto (PUT)", "request": { "method": "PUT", "header": [ {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/produtos/{{produtoId}}", "host": ["{{baseUrl}}"], "path": ["api","produtos","{{produtoId}}"] }, "body": { "mode":"raw", "raw": "{\n  \"nome\": \"Bolo de Rolo\",\n  \"custo\": 13.0,\n  \"preco\": 26.0,\n  \"estoque\": 25\n}" } } },
+        { "name": "Atualizar produto (PATCH)", "request": { "method": "PATCH", "header": [ {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/produtos/{{produtoId}}", "host": ["{{baseUrl}}"], "path": ["api","produtos","{{produtoId}}"] }, "body": { "mode":"raw", "raw": "{\n  \"estoque\": 40\n}" } } },
+        { "name": "Remover produto", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/produtos/{{produtoId}}", "host": ["{{baseUrl}}"], "path": ["api","produtos","{{produtoId}}"] } } }
+      ]
+    },
+    {
+      "name": "Pedidos",
+      "item": [
+        { "name": "Listar pedidos", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/pedidos?page=1&limit=20&cliente=&dataInicio=&dataFim=&status=", "host": ["{{baseUrl}}"], "path": ["api","pedidos"], "query": [{"key":"page","value":"1"},{"key":"limit","value":"20"},{"key":"cliente","value":""},{"key":"dataInicio","value":""},{"key":"dataFim","value":""},{"key":"status","value":""}] } } },
+        { "name": "Criar pedido", "request": { "method": "POST", "header": [ {"key":"Content-Type","value":"application/json"} ], "url": { "raw": "{{baseUrl}}/api/pedidos", "host": ["{{baseUrl}}"], "path": ["api","pedidos"] }, "body": { "mode":"raw", "raw": "{\n  \"cliente_id\": 1,\n  \"itens\": [\n    { \"produto_id\": 1, \"quantidade\": 2 }\n  ],\n  \"formaPagamento\": \"Pix\"\n}" } } },
+        { "name": "Obter pedido por ID", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/pedidos/{{pedidoId}}", "host": ["{{baseUrl}}"], "path": ["api","pedidos","{{pedidoId}}"] } } }
+      ]
+    },
+    {
+      "name": "Relatórios",
+      "item": [
+        { "name": "CMV (opcional periodo=YYYY-MM)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/relatorios/cmv?periodo=", "host": ["{{baseUrl}}"], "path": ["api","relatorios","cmv"], "query": [ {"key":"periodo","value":""} ] } } },
+        { "name": "Rendimento por produto", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/relatorios/rendimento", "host": ["{{baseUrl}}"], "path": ["api","relatorios","rendimento"] } } },
+        { "name": "Estoque baixo (limite)", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/relatorios/estoque-baixo?limite=5", "host": ["{{baseUrl}}"], "path": ["api","relatorios","estoque-baixo"], "query": [ {"key":"limite","value":"5"} ] } } },
+        { "name": "Clientes fiéis", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/relatorios/clientes-fieis", "host": ["{{baseUrl}}"], "path": ["api","relatorios","clientes-fieis"] } } }
+      ]
+    }
+  ],
+  "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+  "variable": [
+    { "key": "baseUrl",   "value": "http://localhost:3000" },
+    { "key": "token",     "value": "" },
+    { "key": "resetToken", "value": "" },
+    { "key": "loginEmail", "value": "" },
+    { "key": "loginPassword", "value": "" },
+    { "key": "clienteId", "value": "1" },
+    { "key": "produtoId", "value": "1" },
+    { "key": "pedidoId",  "value": "1" }
+  ]
+}

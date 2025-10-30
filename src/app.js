@@ -1,4 +1,4 @@
-// 📦 Importações principais
+﻿// ðŸ“¦ ImportaÃ§Ãµes principais
 import express from 'express';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
@@ -6,46 +6,46 @@ import YAML from 'yamljs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// 📁 Rotas principais
+// ðŸ“ Rotas principais
 import authRoutes from './routes/authRoutes.js';
 import clientesRoutes from './routes/clientesRoutes.js';
 import produtosRoutes from './routes/produtosRoutes.js';
 import pedidosRoutes from './routes/pedidosRoutes.js';
 import relatoriosRoutes from './routes/relatoriosRoutes.js';
 
-// ⚙️ Middlewares e serviços
+// âš™ï¸ Middlewares e serviÃ§os
 import { errorHandler } from './middlewares/errorHandler.js';
 import { scheduleCmvUpdater } from './services/cmvService.js';
 
-// 🚀 Inicializa o app Express
+// ðŸš€ Inicializa o app Express
 const app = express();
 app.use(express.json());
 
-// 🌍 Configuração de CORS
+// ðŸŒ ConfiguraÃ§Ã£o de CORS
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// 📘 Caminhos absolutos
+// ðŸ“˜ Caminhos absolutos
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 📄 Swagger — caminho do arquivo YAML
+// ðŸ“„ Swagger â€” caminho do arquivo YAML
 const swaggerPath = path.join(__dirname, 'recursos', 'swagger.yaml');
 const swaggerDocument = YAML.load(swaggerPath);
 
-// 🖼️ Pasta pública para logo
+// ðŸ–¼ï¸ Pasta pÃºblica para logo
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-// 🌗 Swagger com tema escuro + logo oficial Conta Certa
+// ðŸŒ— Swagger com tema escuro + logo oficial Conta Certa
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
   customCss: `
     body { background-color: #0d1117 !important; }
     .topbar { background-color: #161b22 !important; border-bottom: 2px solid #30363d !important; }
     .swagger-ui .topbar-wrapper img {
-      content: url("/public/ContaCerta.png");
+      content: url("/public/ContaCerta.png.png");
       width: 120px;
       height: auto;
       margin-right: 10px;
@@ -67,7 +67,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
     .swagger-ui .opblock-summary-path, .swagger-ui .opblock-summary-description { color: #adbac7 !important; }
     .swagger-ui .model-box, .swagger-ui .model-title, .swagger-ui .response-col_description { color: #8b949e !important; }
   `,
-  customSiteTitle: 'API Conta Certa v3 — Documentação Oficial',
+  customSiteTitle: 'API Conta Certa v3 â€” DocumentaÃ§Ã£o Oficial',
   swaggerOptions: {
     persistAuthorization: true,
     docExpansion: 'list',
@@ -76,23 +76,24 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
   },
 }));
 
-// 🚀 Rotas principais
+// ðŸš€ Rotas principais
 app.use('/api/auth', authRoutes);
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/produtos', produtosRoutes);
 app.use('/api/pedidos', pedidosRoutes);
 app.use('/api/relatorios', relatoriosRoutes);
 
-// 🩺 Healthcheck
-app.get('/', (req, res) => res.json({ status: '✅ API Conta Certa em execução' }));
+// ðŸ©º Healthcheck
+app.get('/', (req, res) => res.json({ status: 'API Conta Certa em execução' }));
 
-// ⚠️ Tratamento global de erros
+// âš ï¸ Tratamento global de erros
 app.use(errorHandler);
 
-// ⏰ Atualização automática de CMV (via CRON)
+// â° AtualizaÃ§Ã£o automÃ¡tica de CMV (via CRON)
 if (process.env.DISABLE_CRON !== '1') {
   scheduleCmvUpdater();
 }
 
-// 📤 Exporta o app para uso no server.js
+// ðŸ“¤ Exporta o app para uso no server.js
 export default app;
+

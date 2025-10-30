@@ -27,7 +27,7 @@ export async function listarComFiltros(req, res, next) {
 export async function criar(req, res, next) {
   try {
     const novo = await produtos.criar(req.body);
-    return res.status(201).json(successResponse(novo, 'Produto criado com sucesso'));
+    return res.status(201).json(successResponse(novo, 'Produto criado com sucesso', 201));
   } catch (e) {
     next(e);
   }

@@ -26,7 +26,7 @@ export async function listarComFiltros(req, res, next) {
 export async function criar(req, res, next) {
   try {
     const novo = await clientes.criar(req.body);
-    return res.status(201).json(successResponse(novo, 'Cliente criado com sucesso'));
+    return res.status(201).json(successResponse(novo, 'Cliente criado com sucesso', 201));
   } catch (e) {
     next(e);
   }

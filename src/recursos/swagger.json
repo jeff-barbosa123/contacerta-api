@@ -1,12 +1,12 @@
 openapi: 3.0.0
 info:
-  title: API ContaCerta
+  title: API ContaCerta 
   version: "1.0.0"
-  description: |
-    API RESTful para controle financeiro e de vendas — ContaCerta v3.
-    Inclui autenticação JWT, CRUDs, cálculo de CMV e relatórios.
+  description: >
+    API RESTful para controle financeiro e de vendas — ContaCerta .
+    Inclui autenticação JWT, CRUDs, cálculo de CMV automático e relatórios.
   contact:
-    name: ContaCerta Team
+    name: Jefferson Paulo Barbosa
 
 servers:
   - url: http://localhost:3000
@@ -31,11 +31,12 @@ components:
       scheme: bearer
       bearerFormat: JWT
 
+  # 🔁 Parâmetros reutilizáveis
   parameters:
     Authorization:
       name: Authorization
       in: header
-      description: Token JWT no formato Bearer <token>
+      description: Token JWT no formato **Bearer &lt;token&gt;**
       required: true
       schema:
         type: string
@@ -49,14 +50,13 @@ components:
         type: integer
         example: 1
 
+  # 📦 Esquemas
   schemas:
     ErroPadrao:
       type: object
       properties:
-        sucesso: { type: boolean, example: false }
         status: { type: integer, example: 400 }
         mensagem: { type: string, example: "Campos obrigatórios ausentes" }
-        timestamp: { type: string, example: "2025-10-29T12:00:00.000Z" }
 
     UsuarioLogin:
       type: object
@@ -68,7 +68,6 @@ components:
     UsuarioLoginResposta:
       type: object
       properties:
-        sucesso: { type: boolean, example: true }
         status: { type: integer, example: 200 }
         mensagem: { type: string, example: "Login realizado com sucesso!" }
         data:
@@ -81,48 +80,6 @@ components:
                 nome: { type: string, example: "Administrador" }
                 email: { type: string, example: "admin@contacerta.com" }
             token: { type: string, example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." }
-        timestamp: { type: string, example: "2025-10-29T12:00:00.000Z" }
-
-    UsuarioRegister:
-      type: object
-      required: [email, senha]
-      properties:
-        nome: { type: string, example: "Maria Souza" }
-        email: { type: string, example: "novo@contacerta.com" }
-        senha:
-          type: string
-          example: "SenhaForte123!"
-          minLength: 8
-          description: "Mín. 8 caracteres, contendo maiúscula, minúscula, número e caractere especial"
-        perfil: { type: string, example: "user" }
-
-    PasswordChangeInput:
-      type: object
-      required: [senhaAtual, novaSenha]
-      properties:
-        senhaAtual: { type: string, example: "SenhaForte123!" }
-        novaSenha:
-          type: string
-          example: "NovaSenhaF0rte!"
-          minLength: 8
-          description: "Mín. 8 caracteres, contendo maiúscula, minúscula, número e caractere especial"
-
-    ForgotPasswordInput:
-      type: object
-      required: [email]
-      properties:
-        email: { type: string, example: "usuario@contacerta.com" }
-
-    ResetPasswordInput:
-      type: object
-      required: [token, novaSenha]
-      properties:
-        token: { type: string, example: "<token_de_reset>" }
-        novaSenha:
-          type: string
-          example: "NovaSenhaF0rte!"
-          minLength: 8
-          description: "Mín. 8 caracteres, contendo maiúscula, minúscula, número e caractere especial"
 
     Cliente:
       type: object
@@ -131,8 +88,6 @@ components:
         nome: { type: string, example: "Maria Souza" }
         telefone: { type: string, example: "(81) 98888-7777" }
         aniversario: { type: string, format: date, example: "1990-03-25" }
-        cpf_cnpj: { type: string, example: "123.456.789-00" }
-        endereco: { type: string, example: "Rua Exemplo, 123 - Recife/PE" }
 
     ClienteInput:
       type: object
@@ -141,18 +96,15 @@ components:
         nome: { type: string, example: "João da Silva" }
         telefone: { type: string, example: "(81) 97777-6666" }
         aniversario: { type: string, format: date, example: "1985-11-12" }
-        cpf_cnpj: { type: string, example: "987.654.321-00" }
-        endereco: { type: string, example: "Av. Teste, 42 - Olinda/PE" }
 
     Produto:
       type: object
       properties:
-        id: { type: integer, example: 10 }
+        id: { type: integer, example: 1 }
         nome: { type: string, example: "Bolo de Rolo" }
         custo: { type: number, example: 12.5 }
         preco: { type: number, example: 25.0 }
         estoque: { type: integer, example: 30 }
-        categoria: { type: string, example: "Doces" }
 
     ProdutoInput:
       type: object
@@ -162,7 +114,6 @@ components:
         custo: { type: number, example: 3.0 }
         preco: { type: number, example: 6.0 }
         estoque: { type: integer, example: 100 }
-        categoria: { type: string, example: "Salgados" }
 
     Pedido:
       type: object
@@ -177,8 +128,6 @@ components:
               produto_id: { type: integer, example: 1 }
               quantidade: { type: integer, example: 2 }
         total: { type: number, example: 50.0 }
-        formaPagamento: { type: string, example: "Pix" }
-        statusPedido: { type: string, example: "Concluido" }
         criadoEm: { type: string, example: "2025-10-26T10:00:00.000Z" }
 
     PedidoInput:
@@ -194,14 +143,12 @@ components:
             properties:
               produto_id: { type: integer, example: 1 }
               quantidade: { type: integer, example: 2 }
-        formaPagamento: { type: string, example: "Pix" }
 
     RelatorioCMV:
       type: object
       properties:
         cmv_total: { type: number, example: 1500.75 }
         cmv_base: { type: number, example: 12.5 }
-        periodo: { type: string, nullable: true, example: "2025-10" }
 
     RelatorioRendimentoItem:
       type: object
@@ -214,22 +161,18 @@ components:
         margem_percentual: { type: string, example: "100.00%" }
         rendimento_total: { type: number, example: 250 }
 
-    RelatorioClientesFieisItem:
-      type: object
-      properties:
-        cliente: { type: string, example: "Maria Souza" }
-        total_pedidos: { type: integer, example: 5 }
-
+# 🔐 Segurança global (continua existindo),
+# mas também mostramos Authorization como PARÂMETRO em cada rota protegida:
 security:
   - bearerAuth: []
 
 paths:
-  # AUTH
+
+  # ---------- AUTH ----------
   /api/auth/login:
     post:
       tags: [auth]
       summary: Realiza o login e retorna o token JWT
-      security: []
       requestBody:
         required: true
         content:
@@ -241,67 +184,7 @@ paths:
         "401": { description: Credenciais incorretas, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
         "500": { description: Erro interno, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
 
-  /api/auth/register:
-    post:
-      tags: [auth]
-      summary: Registra um novo usuário e retorna token JWT
-      security: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/UsuarioRegister" }
-      responses:
-        "201": { description: Usuário criado com sucesso, content: { application/json: { schema: { $ref: "#/components/schemas/UsuarioLoginResposta" } } } }
-        "400": { description: Requisição inválida (e-mail inválido ou senha fraca — mín. 8, com maiúscula, minúscula, número e caractere especial), content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "409": { description: E-mail já cadastrado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "500": { description: Erro interno, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-
-  /api/auth/change-password:
-    post:
-      tags: [auth]
-      summary: Altera a senha do usuário autenticado
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/PasswordChangeInput" }
-      responses:
-        "200": { description: Senha alterada com sucesso }
-        "400": { description: Requisição inválida (campos faltando ou senha fraca), content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "401": { description: Não autenticado ou senha atual incorreta, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "500": { description: Erro interno, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-
-  /api/auth/forgot-password:
-    post:
-      tags: [auth]
-      summary: Solicita reset de senha (sempre 200)
-      security: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/ForgotPasswordInput" }
-      responses:
-        "200": { description: Caso exista, instruções serão enviadas. Em desenvolvimento, um token pode ser retornado na resposta. }
-
-  /api/auth/reset-password:
-    post:
-      tags: [auth]
-      summary: Redefine a senha usando token válido
-      security: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/ResetPasswordInput" }
-      responses:
-        "200": { description: Senha redefinida com sucesso }
-        "400": { description: Requisição inválida (campos faltando ou senha fraca), content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "401": { description: Token inválido ou expirado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "500": { description: Erro interno, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-
-  # CLIENTES
+  # ---------- CLIENTES ----------
   /api/clientes:
     get:
       tags: [clientes]
@@ -358,21 +241,6 @@ paths:
         "200": { description: Cliente atualizado, content: { application/json: { schema: { $ref: "#/components/schemas/Cliente" } } } }
         "400": { description: Requisição inválida, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
         "404": { description: Cliente não encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-    patch:
-      tags: [clientes]
-      summary: Atualiza parcialmente os dados do cliente
-      parameters:
-        - $ref: "#/components/parameters/Authorization"
-        - $ref: "#/components/parameters/IdPath"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/ClienteInput" }
-      responses:
-        "200": { description: Cliente atualizado parcialmente, content: { application/json: { schema: { $ref: "#/components/schemas/Cliente" } } } }
-        "400": { description: Requisição inválida, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "404": { description: Cliente não encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
     delete:
       tags: [clientes]
       summary: Remove cliente
@@ -381,10 +249,10 @@ paths:
         - $ref: "#/components/parameters/IdPath"
       responses:
         "200": { description: Cliente removido }
-        "401": { description: Token inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "404": { description: Cliente não encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "401": { description: Token inválido }
+        "404": { description: Cliente não encontrado }
 
-  # PRODUTOS
+  # ---------- PRODUTOS ----------
   /api/produtos:
     get:
       tags: [produtos]
@@ -399,7 +267,6 @@ paths:
               schema:
                 type: array
                 items: { $ref: "#/components/schemas/Produto" }
-        "401": { description: Token ausente ou inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
     post:
       tags: [produtos]
       summary: Cadastra novo produto
@@ -412,8 +279,7 @@ paths:
             schema: { $ref: "#/components/schemas/ProdutoInput" }
       responses:
         "201": { description: Produto criado, content: { application/json: { schema: { $ref: "#/components/schemas/Produto" } } } }
-        "400": { description: Requisição inválida, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "401": { description: Token ausente ou inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "400": { description: Requisição inválida }
 
   /api/produtos/{id}:
     get:
@@ -424,8 +290,7 @@ paths:
         - $ref: "#/components/parameters/IdPath"
       responses:
         "200": { description: Produto encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/Produto" } } } }
-        "404": { description: Produto não encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "401": { description: Token ausente ou inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "404": { description: Produto não encontrado }
     put:
       tags: [produtos]
       summary: Atualiza produto
@@ -439,23 +304,6 @@ paths:
             schema: { $ref: "#/components/schemas/ProdutoInput" }
       responses:
         "200": { description: Produto atualizado }
-        "400": { description: Requisição inválida, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "401": { description: Token ausente ou inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-    patch:
-      tags: [produtos]
-      summary: Atualiza parcialmente produto
-      parameters:
-        - $ref: "#/components/parameters/Authorization"
-        - $ref: "#/components/parameters/IdPath"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/ProdutoInput" }
-      responses:
-        "200": { description: Produto atualizado parcialmente }
-        "400": { description: Requisição inválida, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "401": { description: Token ausente ou inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
     delete:
       tags: [produtos]
       summary: Remove produto
@@ -464,10 +312,8 @@ paths:
         - $ref: "#/components/parameters/IdPath"
       responses:
         "200": { description: Produto removido }
-        "401": { description: Token ausente ou inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "404": { description: Produto não encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
 
-  # PEDIDOS
+  # ---------- PEDIDOS ----------
   /api/pedidos:
     get:
       tags: [pedidos]
@@ -482,7 +328,6 @@ paths:
               schema:
                 type: array
                 items: { $ref: "#/components/schemas/Pedido" }
-        "401": { description: Token ausente ou inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
     post:
       tags: [pedidos]
       summary: Cria novo pedido
@@ -495,9 +340,6 @@ paths:
             schema: { $ref: "#/components/schemas/PedidoInput" }
       responses:
         "201": { description: Pedido criado }
-        "400": { description: Requisição inválida (ex.: itens ausentes ou produto inexistente), content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "401": { description: Token ausente ou inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "422": { description: Estoque insuficiente, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
 
   /api/pedidos/{id}:
     get:
@@ -508,10 +350,9 @@ paths:
         - $ref: "#/components/parameters/IdPath"
       responses:
         "200": { description: Pedido encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/Pedido" } } } }
-        "401": { description: Token ausente ou inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-        "404": { description: Pedido não encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+        "404": { description: Pedido não encontrado }
 
-  # RELATÓRIOS
+  # ---------- RELATÓRIOS ----------
   /api/relatorios/cmv:
     get:
       tags: [relatorios]
@@ -520,7 +361,6 @@ paths:
         - $ref: "#/components/parameters/Authorization"
       responses:
         "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/RelatorioCMV" } } } }
-        "401": { description: Token ausente ou inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
 
   /api/relatorios/rendimento:
     get:
@@ -536,42 +376,3 @@ paths:
               schema:
                 type: array
                 items: { $ref: "#/components/schemas/RelatorioRendimentoItem" }
-        "401": { description: Token ausente ou inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-
-  /api/relatorios/estoque-baixo:
-    get:
-      tags: [relatorios]
-      summary: Produtos com estoque abaixo do limite
-      parameters:
-        - $ref: "#/components/parameters/Authorization"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id: { type: integer, example: 1 }
-                    nome: { type: string, example: "Bolo de Rolo" }
-                    estoque: { type: integer, example: 2 }
-                    categoria: { type: string, example: "Doces" }
-        "401": { description: Token ausente ou inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
-
-  /api/relatorios/clientes-fieis:
-    get:
-      tags: [relatorios]
-      summary: Clientes com mais compras
-      parameters:
-        - $ref: "#/components/parameters/Authorization"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: "#/components/schemas/RelatorioClientesFieisItem" }
-        "401": { description: Token ausente ou inválido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }

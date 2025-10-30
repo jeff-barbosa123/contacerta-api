@@ -8,6 +8,9 @@ export const db = {
       perfil: 'admin'
     }
   ],
+  passwordResets: [
+    // { userId: 1, tokenHash: 'sha256hex', expiresAt: '2025-10-30T10:00:00Z', used: false }
+  ],
   clientes: [
     { id: 1, nome: 'Maria Souza', telefone: '(81) 98888-7777', aniversario: '1990-03-25' }
   ],

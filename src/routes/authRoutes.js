@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { login } from '../controllers/authController.js';
+import { login, register, changePassword, forgotPassword, resetPassword } from '../controllers/authController.js';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
 
 const router = Router();
 
@@ -9,5 +10,9 @@ const router = Router();
  * @access Público
  */
 router.post('/login', login);
+router.post('/register', register);
+router.post('/change-password', authMiddleware, changePassword);
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password', resetPassword);
 
 export default router;
