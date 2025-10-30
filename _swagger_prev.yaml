@@ -538,3 +538,57 @@ paths:
       responses:
         "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/RelatorioCMV" } } } }
         "401": { description: Token ausente ou inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+
+  /api/relatorios/rendimento:
+    get:
+      tags: [relatorios]
+      summary: Retorna rendimento por produto
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/RelatorioRendimentoItem" }
+        "401": { description: Token ausente ou inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+
+  /api/relatorios/estoque-baixo:
+    get:
+      tags: [relatorios]
+      summary: Produtos com estoque abaixo do limite
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: { type: integer, example: 1 }
+                    nome: { type: string, example: "Bolo de Rolo" }
+                    estoque: { type: integer, example: 2 }
+                    categoria: { type: string, example: "Doces" }
+        "401": { description: Token ausente ou inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }
+
+  /api/relatorios/clientes-fieis:
+    get:
+      tags: [relatorios]
+      summary: Clientes com mais compras
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/RelatorioClientesFieisItem" }
+        "401": { description: Token ausente ou inv├ílido, content: { application/json: { schema: { $ref: "#/components/schemas/ErroPadrao" } } } }

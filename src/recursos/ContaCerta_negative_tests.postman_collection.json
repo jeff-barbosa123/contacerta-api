@@ -1,0 +1,84 @@
+{
+  "info": {
+    "name": "API ContaCerta v2.1.0 - Negative Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Pedidos",
+      "item": [
+        {
+          "name": "Criar pedido - estoque insuficiente (422)",
+          "request": {
+            "method": "POST",
+            "header": [ {"key":"Content-Type","value":"application/json"} ],
+            "url": { "raw": "{{baseUrl}}/api/pedidos", "host": ["{{baseUrl}}"], "path": ["api","pedidos"] },
+            "body": { "mode":"raw", "raw": "{\n  \"cliente_id\": 1,\n  \"itens\": [\n    { \"produto_id\": 1, \"quantidade\": 9999 }\n  ],\n  \"formaPagamento\": \"Pix\"\n}" }
+          },
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": [
+              "const json = pm.response.json();",
+              "pm.test('Codigo ERR_ESTOQUE_INSUFICIENTE', function(){ pm.expect(json.codigo).to.eql('ERR_ESTOQUE_INSUFICIENTE'); });"
+            ] } }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Produtos",
+      "item": [
+        {
+          "name": "Criar produto - inválido (400)",
+          "request": {
+            "method": "POST",
+            "header": [ {"key":"Content-Type","value":"application/json"} ],
+            "url": { "raw": "{{baseUrl}}/api/produtos", "host": ["{{baseUrl}}"], "path": ["api","produtos"] },
+            "body": { "mode":"raw", "raw": "{\n  \"nome\": \"\",\n  \"preco\": -1\n}" }
+          },
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": [
+              "const json = pm.response.json();",
+              "pm.test('Codigo de validação', function(){ pm.expect(['ERR_VALIDACAO_CAMPOS','ERR_PARAMETROS_INVALIDOS']).to.include(json.codigo); });"
+            ] } }
+          ]
+        },
+        {
+          "name": "Atualizar produto - ID inexistente (404)",
+          "request": {
+            "method": "PUT",
+            "header": [ {"key":"Content-Type","value":"application/json"} ],
+            "url": { "raw": "{{baseUrl}}/api/produtos/99999", "host": ["{{baseUrl}}"], "path": ["api","produtos","99999"] },
+            "body": { "mode":"raw", "raw": "{\n  \"nome\": \"X\",\n  \"custo\": 1,\n  \"preco\": 2,\n  \"estoque\": 1\n}" }
+          },
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": [
+              "const json = pm.response.json();",
+              "pm.test('Codigo ERR_PRODUTO_INEXISTENTE', function(){ pm.expect(json.codigo).to.eql('ERR_PRODUTO_INEXISTENTE'); });"
+            ] } }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Relatórios",
+      "item": [
+        {
+          "name": "CMV - periodo inválido (400)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/relatorios/cmv?periodo=2025-13", "host": ["{{baseUrl}}"], "path": ["api","relatorios","cmv"], "query": [ {"key":"periodo","value":"2025-13"} ] }
+          },
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": [
+              "const json = pm.response.json();",
+              "pm.test('Codigo ERR_PERIODO_INVALIDO', function(){ pm.expect(json.codigo).to.eql('ERR_PERIODO_INVALIDO'); });"
+            ] } }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl",   "value": "http://localhost:3000" }
+  ]
+}
